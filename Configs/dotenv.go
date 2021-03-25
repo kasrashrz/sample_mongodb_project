@@ -9,7 +9,7 @@ import (
 
 func DotEnv(input string) string {
 
-	err := godotenv.Load(filepath.Join("/home/go/src/mongo_sample_project/Configs/", "setup.env"))
+	err := godotenv.Load(filepath.Join("/home/kasra/mong_golang/Configs/", "setup.env"))
 	if err != nil {
 		fmt.Println(err)
 	}

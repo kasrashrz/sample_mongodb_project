@@ -1,5 +1,9 @@
 package app
-import "github.com/gin-gonic/gin"
+
+import (
+    "github.com/gin-gonic/gin"
+    "kasra_medrick.com/mongo/Configs"
+)
 
 var (
     router = gin.Default()
@@ -7,6 +11,7 @@ var (
 
 func StartApp(){
     mapURLs()
-    router.Run(":3000")
+    port := Configs.DotEnv("PORT")
+    router.Run(":"+port)
 }
 
