@@ -9,4 +9,7 @@ var event Models.Event
 func mapURLs (){
     router.GET("/ping", Controllers.Ping)
     router.GET("/event/:id", event.RETRIEVE)
+    router.GET("/events/all", event.GetAll)
+	router.POST("/events/add", event.Add)
+
 }

@@ -2,26 +2,29 @@ package Models
 
 import (
 	"context"
+	_ "errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"kasra_medrick.com/mongo/Configs/db"
 	"log"
 	"time"
 )
 
-type Method struct {
-
-}
-
 type MethodHandler interface {
 	GetByID(id string)
+	FindAll()
+	Create()
+	AddUser()
 }
 
-func (event Event) GetByID(id string) (*Event, error) {
+func (event Event) GetByID(colName string, id string) (*Event, error) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection := db.GetCollection("Events")
+	collection := db.GetCollection(colName)
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Printf("Failed to create object id from hex %v", id)
@@ -34,4 +37,72 @@ func (event Event) GetByID(id string) (*Event, error) {
 		return nil, err
 	}
 	return &result, nil
+}
+
+func (event *Event) FindAll (colName string) ([]Event, error) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	var result []Event
+	cursor, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		log.Printf("Unable find user by id %f", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &result); err != nil {
+		log.Fatal(err)
+	}
+	return result, nil
+}
+
+func (event Event) Create (ctx *gin.Context, id string) (Event, error){
+	var ev Event
+	err := ctx.BindJSON(&ev)
+	if err != nil {
+		log.Printf("Unable to parse body %f", err)
+		return Event{}, err
+	}
+
+	if len(id) > 0 {
+		docID, err := primitive.ObjectIDFromHex(id)
+
+		if err != nil {
+			log.Printf("Failed to create object id from hex %v", id)
+			return Event{}, err
+		}
+		ev.ID = docID
+	}
+	//TODO : CONTROLLER LAYER (VALIDATORS)
+	//if len(us.Name) == 0 {
+	//	return Event{}, error.New("name is required")
+	//}
+	//if len(us.Birthday) == 0 {
+	//	return Event{}, errors.New("birthday is required")
+	//}
+	return ev, nil
+}
+
+func (event Event) AddEvent() ( *mongo.InsertOneResult, error) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	collection := db.GetCollection("Events")
+	var repetition Repetition
+	var rep = Repetition{
+		StartPreActiveTime: repetition.StartPreActiveTime,
+		StartTime:          repetition.StartTime,
+		EndTime:            repetition.EndTime,
+		Terminate:          repetition.Terminate,
+		StartJoinTime:      repetition.StartJoinTime,
+		EndJoinTime:        repetition.EndJoinTime,
+	}
+	res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env, "EventEndTime": event.EventEndTime,"Repetition": rep  })
+	fmt.Println(res)
+	if err != nil {
+		log.Printf("Failed to insert user into DB %f", err)
+		return nil, err
+	}
+	log.Printf("Successfully inserted user %f", res.InsertedID)
+	return res, nil
 }
