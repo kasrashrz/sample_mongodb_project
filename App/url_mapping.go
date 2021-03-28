@@ -1,5 +1,5 @@
 package app
-import 
+import
 (
     "kasra_medrick.com/mongo/Controllers"
     _ "kasra_medrick.com/mongo/Controllers"
@@ -8,8 +8,8 @@ import
 var event Models.Event
 func mapURLs (){
     router.GET("/ping", Controllers.Ping)
-    router.GET("/event/:id", event.RETRIEVE)
-    router.GET("/events/all", event.GetAll)
-	router.POST("/events/add", event.Add)
+    router.GET("/event/:id", Controllers.GetOneEvent)
+    router.GET("/events/all", Controllers.GetAllEvents)
+	router.POST("/events/add", Controllers.CreateEvent)
 
 }

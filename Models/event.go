@@ -18,21 +18,21 @@ const (
 )
 
 type Event struct {
-	ID 		  primitive.ObjectID `bson:"_id" json:"id"`
-	Name string
-	Market_name string
-	Env string
-    EventEndTime EventEndTimeType
-	Repetition Repetition
+	ID 		  primitive.ObjectID  `bson:"_id" json:"id"`
+	Name string	     			  `json:"name"`
+	Market_name string 			  `json:"market_name"`
+	Env string 					  `json:"env"`
+    EventEndTime string `json:"eventEndTime"`
+	Repetition Repetition 		  `json:"repetition"`
 }
 
 type Event_Handler interface {
 	Add(ctx *gin.Context)
-	RETRIEVE(ctx *gin.Context)
+	GetOne(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
 }
 
-func (event Event) RETRIEVE(ctx *gin.Context) {
+func (event Event) GetOne(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
 		event, err := userModel.GetByID("Events",id)

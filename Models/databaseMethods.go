@@ -56,10 +56,10 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	return result, nil
 }
 
-func (event Event) Create (ctx *gin.Context, id string) (Event, error){
-	var ev Event
-	err := ctx.BindJSON(&ev)
-	fmt.Println(ev)
+func (events Event) Create (ctx *gin.Context, id string) (Event, error){
+	var event Event
+	err := ctx.BindJSON(&event)
+	fmt.Println(event)
 	if err != nil {
 		log.Printf("Unable to parse body %f", err)
 		return Event{}, err
@@ -72,7 +72,7 @@ func (event Event) Create (ctx *gin.Context, id string) (Event, error){
 			log.Printf("Failed to create object id from hex %v", id)
 			return Event{}, err
 		}
-		ev.ID = docID
+		event.ID = docID
 	}
 	//TODO : CONTROLLER LAYER (VALIDATORS)
 	//if len(us.Name) == 0 {
@@ -81,7 +81,7 @@ func (event Event) Create (ctx *gin.Context, id string) (Event, error){
 	//if len(us.Birthday) == 0 {
 	//	return Event{}, errors.New("birthday is required")
 	//}
-	return ev, nil
+	return event, nil
 }
 
 func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
@@ -89,18 +89,23 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
-	//var repetition Repetition
-	//var rep = Repetition{
-	//	StartPreActiveTime: event.Repetition.StartPreActiveTime,
-	//	StartTime:          event.Repetition.StartTime,
-	//	EndTime:            event.Repetition.EndTime,
-	//	Terminate:          event.Repetition.Terminate,
-	//	StartJoinTime:      event.Repetition.StartJoinTime,
-	//	EndJoinTime:        repetition.EndJoinTime,
-	//}
-	//fmt.Println(rep)
-	//fmt.Println(event.Repetition)
-	res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env, "EventEndTime": event.EventEndTime})
+	ins := Event{
+		ID: primitive.NewObjectID(),
+		Name:         event.Name,
+		Market_name:  event.Market_name,
+		Env:          event.Env,
+		EventEndTime: event.EventEndTime,
+		Repetition:   Repetition{
+			StartPreActiveTime: event.Repetition.StartPreActiveTime,
+			StartTime:          event.Repetition.StartTime,
+			EndTime:            event.Repetition.EndTime,
+			Terminate:          event.Repetition.Terminate,
+			StartJoinTime:      event.Repetition.StartJoinTime,
+			EndJoinTime:        event.Repetition.EndJoinTime,
+		},
+	}
+	//res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env})
+	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		log.Printf("Failed to insert user into DB %f", err)
 		return nil, err
