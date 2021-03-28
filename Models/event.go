@@ -69,7 +69,7 @@ func (event Event) Add (ctx *gin.Context){
 		return
 	}
 
-	res, err := user.AddEvent()
+	res, err := user.AddEvent("Events")
 
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
