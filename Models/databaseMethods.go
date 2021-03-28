@@ -16,8 +16,9 @@ import (
 type MethodHandler interface {
 	GetByID(id string)
 	FindAll()
-	Create()
-	AddUser()
+	Insert()
+	AddEvent()
+	DeleteById(id string)
 }
 
 func (event Event) GetByID(colName string, id string) (*Event, error) {
@@ -56,7 +57,7 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	return result, nil
 }
 
-func (events Event) Create (ctx *gin.Context, id string) (Event, error){
+func (events Event) Insert (ctx *gin.Context, id string) (Event, error){
 	var event Event
 	err := ctx.BindJSON(&event)
 	fmt.Println(event)
@@ -112,4 +113,23 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
 	}
 	log.Printf("Successfully inserted user %f", res.InsertedID)
 	return res, nil
+}
+
+func (event Event) DeleteById(colName string, id string) (*Event, error) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	docID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("Failed to create object id from hex %v", id)
+		return nil, err
+	}
+	var result Event
+	err = collection.FindOneAndDelete(ctx, bson.M{"_id": docID}).Decode(&result)
+	if err != nil {
+		log.Printf("Unable find user by id %f", err)
+		return nil, err
+	}
+	return &result, nil
 }

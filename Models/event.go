@@ -27,9 +27,10 @@ type Event struct {
 }
 
 type Event_Handler interface {
-	Add(ctx *gin.Context)
+	AddOne(ctx *gin.Context)
 	GetOne(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
+	DeleteOne(ctx *gin.Context)
 }
 
 func (event Event) GetOne(ctx *gin.Context) {
@@ -60,8 +61,8 @@ func (events Event) GetAll(ctx *gin.Context){
 		return
 }
 
-func (event Event) Add (ctx *gin.Context){
-	user, err := userModel.Create(ctx, "")
+func (event Event) AddOne(ctx *gin.Context){
+	user, err := userModel.Insert(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
@@ -77,4 +78,21 @@ func (event Event) Add (ctx *gin.Context){
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Success", "id": res.InsertedID})
+}
+
+func (event Event) DeleteOne(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id != "" {
+		event, err := userModel.DeleteById("Events",id)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Error to delete event", "error": err})
+			ctx.Abort()
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Event has deleted successfully", "ID": event.ID})
+		return
+	}
+	ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+	ctx.Abort()
+	return
 }

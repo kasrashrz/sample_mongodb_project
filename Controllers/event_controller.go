@@ -7,7 +7,7 @@ import (
 var event Models.Event
 
 func CreateEvent(ctx *gin.Context){
-	event.Add(ctx)
+	event.AddOne(ctx)
 }
 
 func GetAllEvents(ctx *gin.Context){
@@ -16,4 +16,8 @@ func GetAllEvents(ctx *gin.Context){
 
 func GetOneEvent(ctx *gin.Context){
 	event.GetOne(ctx)
+}
+
+func DeleteOneEvent(ctx *gin.Context){
+	event.DeleteOne(ctx)
 }
