@@ -25,7 +25,7 @@ type User_Event_Handler interface {
 }
 
 func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
-	user, err := userModel.Check(ctx, "")
+	user, err := userModel.CheckUserEvent(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})

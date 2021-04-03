@@ -78,13 +78,29 @@ func (events Event) Check (ctx *gin.Context, id string) (Event, error){
 		event.ID = docID
 	}
 	//TODO : CONTROLLER LAYER (VALIDATORS)
-	//if len(us.Name) == 0 {
-	//	return Event{}, error.New("name is required")
-	//}
-	//if len(us.Birthday) == 0 {
-	//	return Event{}, errors.New("birthday is required")
-	//}
 	return event, nil
+}
+
+func (events Event) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, error) {
+	var UE UserEvent
+	err := ctx.BindJSON(&UE)
+	fmt.Println(UE)
+	if err != nil {
+		log.Printf("Unable to parse body %f", err)
+		return UserEvent{}, err
+	}
+
+	if len(id) > 0 {
+		docID, err := primitive.ObjectIDFromHex(id)
+
+		if err != nil {
+			log.Printf("Failed to create object id from hex %v", id)
+			return UserEvent{}, err
+		}
+		UE.ID = docID
+	}
+	//TODO : CONTROLLER LAYER (VALIDATORS)
+	return UE, nil
 }
 
 func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
@@ -117,7 +133,7 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
 	return res, nil
 }
 
-func (UE UserEvent) AddUserEvent(colName string) ( *mongo.InsertOneResult, error) {
+func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, error) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
