@@ -33,7 +33,7 @@ func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
 		return
 	}
 
-	res, err := user.AddEvent("UserEvent")
+	res, err := user.AddUserEvent("UserEvent")
 
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)

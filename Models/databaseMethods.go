@@ -18,6 +18,7 @@ type MethodHandler interface {
 	FindAll()
 	Insert()
 	AddEvent()
+	AddUserEvent()
 	DeleteById(id string)
 	Update()
 }
@@ -92,7 +93,7 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
 	defer cancel()
 	collection := db.GetCollection(colName)
 	ins := Event{
-		ID: primitive.NewObjectID(),
+		ID: 		  primitive.NewObjectID(),
 		Name:         event.Name,
 		Market_name:  event.Market_name,
 		Env:          event.Env,
@@ -104,6 +105,38 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
 			Terminate:          event.Repetition.Terminate,
 			StartJoinTime:      event.Repetition.StartJoinTime,
 			EndJoinTime:        event.Repetition.EndJoinTime,
+		},
+	}
+	//res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env})
+	res, err := collection.InsertOne(ctx, ins)
+	if err != nil {
+		log.Printf("Failed to insert user into DB %f", err)
+		return nil, err
+	}
+	log.Printf("Successfully inserted user %f", res.InsertedID)
+	return res, nil
+}
+
+func (UE UserEvent) AddUserEvent(colName string) ( *mongo.InsertOneResult, error) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	ins := UserEvent{
+		ID:              primitive.NewObjectID(),
+		UUID:            UE.UUID,
+		GlobalUniqueId:  UE.GlobalUniqueId,
+		GamePackageName: UE.GamePackageName,
+		Env:             UE.Env,
+		MarketName:      UE.MarketName,
+		UserEventData:   UserEventData{
+			EventId:        UE.UserEventData.EventId,
+			UserEventStage: UE.UserEventData.UserEventStage,
+			Score:          UE.UserEventData.Score,
+			JoinTime:       UE.UserEventData.JoinTime,
+			EndTime:        UE.UserEventData.EndTime,
+			StartTime:      UE.UserEventData.StartTime,
+			PreActiveTime:  UE.UserEventData.PreActiveTime,
 		},
 	}
 	//res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env})
