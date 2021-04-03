@@ -59,7 +59,7 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	return result, nil
 }
 
-func (events Event) Check (ctx *gin.Context, id string) (Event, error){
+func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, error){
 	var event Event
 	err := ctx.BindJSON(&event)
 	fmt.Println(event)

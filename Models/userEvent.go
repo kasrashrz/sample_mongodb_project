@@ -8,7 +8,7 @@ import (
 
 type UserEvent struct {
 	ID primitive.ObjectID  		`bson:"_id" json:"id"`
-	UUID string 		   		`json:"uuid"`
+	UUID string 		   		`bson:"UUID" json:"uuid"`
 	GlobalUniqueId string  		`json:"globalUniqueId"`
 	GamePackageName string 		`json:"gamePackageName"`
 	Env string 			   		`json:"env"`

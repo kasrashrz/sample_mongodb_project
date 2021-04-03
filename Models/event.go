@@ -63,7 +63,7 @@ func (events Event) GetAllEvents(ctx *gin.Context){
 }
 
 func (event Event) AddOneEvent(ctx *gin.Context){
-	user, err := userModel.Check(ctx, "")
+	user, err := userModel.CheckEvent(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
@@ -105,7 +105,7 @@ func (event Event) UpdateOneEvent(ctx *gin.Context) {
 		return
 	}
 
-	SpecEvent, err := event.Check(ctx, ctx.Param("id"))
+	SpecEvent, err := event.CheckEvent(ctx, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
 		ctx.Abort()
