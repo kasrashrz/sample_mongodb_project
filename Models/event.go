@@ -22,7 +22,7 @@ type Event struct {
 	Name string	     			  `json:"name"`
 	Market_name string 			  `json:"market_name"`
 	Env string 					  `json:"env"`
-    EventEndTime string `json:"eventEndTime"`
+    EventEndTime string 		  `json:"eventEndTime"`
 	Repetition Repetition 		  `json:"repetition"`
 }
 
@@ -31,6 +31,7 @@ type Event_Handler interface {
 	GetOne(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
 	DeleteOne(ctx *gin.Context)
+	UpdateOne(ctx *gin.Context)
 }
 
 func (event Event) GetOne(ctx *gin.Context) {
@@ -62,7 +63,7 @@ func (events Event) GetAll(ctx *gin.Context){
 }
 
 func (event Event) AddOne(ctx *gin.Context){
-	user, err := userModel.Insert(ctx, "")
+	user, err := userModel.Check(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
@@ -93,6 +94,33 @@ func (event Event) DeleteOne(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+	ctx.Abort()
+	return
+}
+
+func (event Event) UpdateOne (ctx *gin.Context) {
+	if ctx.Param("id") == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		ctx.Abort()
+		return
+	}
+
+	SpecEvent, err := event.Check(ctx, ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	_, err = event.Update(SpecEvent,"Events")
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "User successfully updated ", "user": SpecEvent.ID.Hex()})
 	ctx.Abort()
 	return
 }

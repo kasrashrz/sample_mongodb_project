@@ -19,6 +19,7 @@ type MethodHandler interface {
 	Insert()
 	AddEvent()
 	DeleteById(id string)
+	Update()
 }
 
 func (event Event) GetByID(colName string, id string) (*Event, error) {
@@ -57,7 +58,7 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	return result, nil
 }
 
-func (events Event) Insert (ctx *gin.Context, id string) (Event, error){
+func (events Event) Check (ctx *gin.Context, id string) (Event, error){
 	var event Event
 	err := ctx.BindJSON(&event)
 	fmt.Println(event)
@@ -132,4 +133,37 @@ func (event Event) DeleteById(colName string, id string) (*Event, error) {
 		return nil, err
 	}
 	return &result, nil
+}
+
+func (events Event) Update(event Event,colName string)(*mongo.UpdateResult, error){
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection :=  db.GetCollection(colName)
+	id, err := primitive.ObjectIDFromHex("6065c2203a84db42c53c8d04")
+	filter := bson.M{"_id": id}
+	if err != nil {
+		log.Printf("Faild to update id %v %v", event.ID, err)
+		return nil, err
+	}
+	update :=  bson.D{
+		{"$set", bson.D{
+			{"name", string(event.Name)},
+			{"market_name", event.Market_name},
+			{"env", event.Env},
+			{"eventEndTime", event.EventEndTime},
+			{"repetition.startPreActiveTime", event.Repetition.StartPreActiveTime},
+			{"repetition.startTime", event.Repetition.StartTime},
+			{"repetition.endTime", event.Repetition.EndTime},
+			{"repetition.Terminate", event.Repetition.Terminate},
+			{"repetition.startJoinTime", event.Repetition.StartJoinTime},
+			{"repetition.endJoinTime", event.Repetition.EndJoinTime},
+		}},
+	}
+	res, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Printf("Faild to update id %v %v", event.ID, err)
+		return nil, err
+	}
+	return res, err
 }

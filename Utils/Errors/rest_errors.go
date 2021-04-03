@@ -1,1 +1,2 @@
 package Errors
+//TODO: CREATE REST ERRORS AND USE IT ANYWHERE!!

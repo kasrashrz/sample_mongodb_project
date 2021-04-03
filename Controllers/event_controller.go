@@ -21,3 +21,7 @@ func GetOneEvent(ctx *gin.Context){
 func DeleteOneEvent(ctx *gin.Context){
 	event.DeleteOne(ctx)
 }
+
+func UpdateById(ctx *gin.Context){
+	event.UpdateOne(ctx)
+}
