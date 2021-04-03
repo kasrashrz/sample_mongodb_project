@@ -1,13 +1,44 @@
 package Models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"net/http"
+)
 
 type UserEvent struct {
-	ID primitive.ObjectID  `bson:"_id" json:"id"`
-	UUID string 		   `bson:"uuid" json:"uuid"`
-	GlobalUniqueId string  `bson:"globalUniqueId" json:"globalUniqueId"`
-	GamePackageName string `bson:"gamePackageName" json:"gamePackageName"`
-	Env string 			   `bson:"env" json:"env"`
-	MarketName string 	   `bson:"marketName" json:"marketName"`
-	UserEventData UserEventData
+	ID primitive.ObjectID  		`bson:"_id" json:"id"`
+	UUID string 		   		`json:"uuid"`
+	GlobalUniqueId string  		`json:"globalUniqueId"`
+	GamePackageName string 		`json:"gamePackageName"`
+	Env string 			   		`json:"env"`
+	MarketName string 	   		`json:"marketName"`
+	UserEventData UserEventData	`json:"userEventData"`
+}
+
+type User_Event_Handler interface {
+	AddOneUserEvent(ctx *gin.Context)
+	GetOneUserEvent(ctx *gin.Context)
+	GetAllUserEvents(ctx *gin.Context)
+	DeleteOneUserEvents(ctx *gin.Context)
+	UpdateOneUserEvents(ctx *gin.Context)
+}
+
+func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
+	user, err := userModel.Check(ctx, "")
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	res, err := user.AddEvent("UserEvent")
+
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Success", "id": res.InsertedID})
 }

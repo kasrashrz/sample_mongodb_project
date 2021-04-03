@@ -27,14 +27,14 @@ type Event struct {
 }
 
 type Event_Handler interface {
-	AddOne(ctx *gin.Context)
-	GetOne(ctx *gin.Context)
-	GetAll(ctx *gin.Context)
-	DeleteOne(ctx *gin.Context)
-	UpdateOne(ctx *gin.Context)
+	AddOneEvent(ctx *gin.Context)
+	GetOneEvent(ctx *gin.Context)
+	GetAllEvents(ctx *gin.Context)
+	DeleteOneEvent(ctx *gin.Context)
+	UpdateOneEvent(ctx *gin.Context)
 }
 
-func (event Event) GetOne(ctx *gin.Context) {
+func (event Event) GetOneEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
 		event, err := userModel.GetByID("Events",id)
@@ -51,7 +51,7 @@ func (event Event) GetOne(ctx *gin.Context) {
 	return
 }
 
-func (events Event) GetAll(ctx *gin.Context){
+func (events Event) GetAllEvents(ctx *gin.Context){
 		event, err := userModel.FindAll("Events")
 		if err != nil {
 			fmt.Println(err)
@@ -62,7 +62,7 @@ func (events Event) GetAll(ctx *gin.Context){
 		return
 }
 
-func (event Event) AddOne(ctx *gin.Context){
+func (event Event) AddOneEvent(ctx *gin.Context){
 	user, err := userModel.Check(ctx, "")
 
 	if err != nil {
@@ -81,7 +81,7 @@ func (event Event) AddOne(ctx *gin.Context){
 	ctx.JSON(http.StatusOK, gin.H{"message": "Success", "id": res.InsertedID})
 }
 
-func (event Event) DeleteOne(ctx *gin.Context) {
+func (event Event) DeleteOneEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
 		event, err := userModel.DeleteById("Events",id)
@@ -98,7 +98,7 @@ func (event Event) DeleteOne(ctx *gin.Context) {
 	return
 }
 
-func (event Event) UpdateOne (ctx *gin.Context) {
+func (event Event) UpdateOneEvent(ctx *gin.Context) {
 	if ctx.Param("id") == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		ctx.Abort()

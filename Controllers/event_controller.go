@@ -6,22 +6,22 @@ import (
 )
 var event Models.Event
 
-func CreateEvent(ctx *gin.Context){
-	event.AddOne(ctx)
+func CreateEventController(ctx *gin.Context){
+	event.AddOneEvent(ctx)
 }
 
-func GetAllEvents(ctx *gin.Context){
-	event.GetAll(ctx)
+func GetAllEventsController(ctx *gin.Context){
+	event.GetAllEvents(ctx)
 }
 
-func GetOneEvent(ctx *gin.Context){
-	event.GetOne(ctx)
+func GetOneEventController(ctx *gin.Context){
+	event.GetOneEvent(ctx)
 }
 
-func DeleteOneEvent(ctx *gin.Context){
-	event.DeleteOne(ctx)
+func DeleteOneEventController(ctx *gin.Context){
+	event.DeleteOneEvent(ctx)
 }
 
 func UpdateById(ctx *gin.Context){
-	event.UpdateOne(ctx)
+	event.UpdateOneEvent(ctx)
 }

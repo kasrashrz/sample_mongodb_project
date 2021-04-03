@@ -11,11 +11,12 @@ func mapURLs (){
     //TODO: USER_EVENT MODEL AND ROUTES
     //TODO: SWAGGER!
     router.GET("/ping", Controllers.Ping)
-    router.GET("/event/:id", Controllers.GetOneEvent)
-    router.GET("/events/all", Controllers.GetAllEvents)
-	router.POST("/event/add", Controllers.CreateEvent)
-    router.POST("/event/delete/:id", Controllers.DeleteOneEvent)
+    router.GET("/event/:id", Controllers.GetOneEventController)
+    router.GET("/events/all", Controllers.GetAllEventsController)
+	router.POST("/event/add", Controllers.CreateEventController)
+    router.POST("/event/delete/:id", Controllers.DeleteOneEventController)
     router.POST("/event/update/:id", Controllers.UpdateById)
+    router.POST("/user_event/add", Controllers.CreateEventController)
 
 
 }
