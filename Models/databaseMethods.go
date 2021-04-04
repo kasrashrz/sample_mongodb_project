@@ -15,12 +15,15 @@ import (
 
 type MethodHandler interface {
 	GetByID(id string)
+	DeleteById(id string)
+	FindAllUES()
 	FindAll()
 	Insert()
-	AddEvent()
-	AddUserEvent()
-	DeleteById(id string)
 	Update()
+	AddEvent()
+	CheckEvent()
+	AddUserEvent()
+	CheckUserEvent()
 }
 
 func (event Event) GetByID(colName string, id string) (*Event, error) {
@@ -48,6 +51,23 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	defer cancel()
 	collection := db.GetCollection(colName)
 	var result []Event
+	cursor, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		log.Printf("Unable find user by id %f", err)
+		return nil, err
+	}
+	if err = cursor.All(ctx, &result); err != nil {
+		log.Fatal(err)
+	}
+	return result, nil
+}
+
+func (event *Event) FindAllUES (colName string) ([]UserEvent, error) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	var result []UserEvent
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		log.Printf("Unable find user by id %f", err)
@@ -184,12 +204,12 @@ func (event Event) DeleteById(colName string, id string) (*Event, error) {
 	return &result, nil
 }
 
-func (events Event) Update(event Event,colName string)(*mongo.UpdateResult, error){
+func (events Event) Update(event Event,colName string,EventId string)(*mongo.UpdateResult, error){
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection :=  db.GetCollection(colName)
-	id, err := primitive.ObjectIDFromHex("6065c2203a84db42c53c8d04")
+	id, err := primitive.ObjectIDFromHex(EventId)
 	filter := bson.M{"_id": id}
 	if err != nil {
 		log.Printf("Faild to update id %v %v", event.ID, err)
@@ -197,16 +217,16 @@ func (events Event) Update(event Event,colName string)(*mongo.UpdateResult, erro
 	}
 	update :=  bson.D{
 		{"$set", bson.D{
-			{"name", string(event.Name)},
-			{"market_name", event.Market_name},
-			{"env", event.Env},
-			{"eventEndTime", event.EventEndTime},
-			{"repetition.startPreActiveTime", event.Repetition.StartPreActiveTime},
-			{"repetition.startTime", event.Repetition.StartTime},
-			{"repetition.endTime", event.Repetition.EndTime},
-			{"repetition.Terminate", event.Repetition.Terminate},
-			{"repetition.startJoinTime", event.Repetition.StartJoinTime},
-			{"repetition.endJoinTime", event.Repetition.EndJoinTime},
+			{"Name", event.Name},
+			{"Market_Name", event.Market_name},
+			{"Env", event.Env},
+			{"EventEndTime", event.EventEndTime},
+			{"Repetition.StartPreActiveTime", event.Repetition.StartPreActiveTime},
+			{"Repetition.StartTime", event.Repetition.StartTime},
+			{"Repetition.EndTime", event.Repetition.EndTime},
+			{"Repetition.Terminate", event.Repetition.Terminate},
+			{"Repetition.StartJoinTime", event.Repetition.StartJoinTime},
+			{"Repetition.EndJoinTime", event.Repetition.EndJoinTime},
 		}},
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)

@@ -19,11 +19,11 @@ const (
 
 type Event struct {
 	ID 		  primitive.ObjectID  `bson:"_id" json:"id"`
-	Name string	     			  `json:"name"`
-	Market_name string 			  `json:"market_name"`
-	Env string 					  `json:"env"`
-    EventEndTime string 		  `json:"eventEndTime"`
-	Repetition Repetition 		  `json:"repetition"`
+	Name string	     			  `bson:"Name" json:"name"`
+	Market_name string 			  `bson:"Market_Name" json:"market_name"`
+	Env string 					  `bson:"Env" json:"env"`
+    EventEndTime string 		  `bson:"EventEndTime" json:"eventEndTime"`
+	Repetition Repetition 		  `bson:"Repetition" json:"repetition"`
 }
 
 type Event_Handler interface {
@@ -99,7 +99,8 @@ func (event Event) DeleteOneEvent(ctx *gin.Context) {
 }
 
 func (event Event) UpdateOneEvent(ctx *gin.Context) {
-	if ctx.Param("id") == "" {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		ctx.Abort()
 		return
@@ -112,7 +113,7 @@ func (event Event) UpdateOneEvent(ctx *gin.Context) {
 		return
 	}
 
-	_, err = event.Update(SpecEvent,"Events")
+	_, err = event.Update(SpecEvent,"Events", id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})

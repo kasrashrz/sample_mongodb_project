@@ -10,3 +10,7 @@ var user_event Models.UserEvent
 func CreateUEController(ctx *gin.Context){
 	user_event.AddOneUserEvent(ctx)
 }
+
+func GetAllUESControllers(ctx *gin.Context){
+	user_event.GetAllUserEvents(ctx)
+}

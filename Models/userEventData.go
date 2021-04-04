@@ -1,12 +1,12 @@
 package Models
 
 type UserEventData struct {
-	EventId string				`json:"eventId"`
-	UserEventStage string		`json:"userEventStage"`
+	EventId string				`bson:"EventId" json:"eventId"`
+	UserEventStage string		`bson:"UserEventStage" json:"userEventStage"`
 	//UserMetaData types.Array	`json:"marketName"`
-	Score  int					`json:"score"`
-	JoinTime int64				`json:"joinTime"`
-	EndTime int64				`json:"endTime"`
-	StartTime int64				`json:"startTime"`
-	PreActiveTime int64			`json:"preActiveTime"`
+	Score  int					`bson:"Score" json:"score"`
+	JoinTime int64				`bson:"JoinTime" json:"joinTime"`
+	EndTime int64				`bson:"EndTime" json:"endTime"`
+	StartTime int64				`bson:"StartTime" json:"startTime"`
+	PreActiveTime int64			`bson:"PreActiveTime" json:"preActiveTime"`
 }

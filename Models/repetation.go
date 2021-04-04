@@ -1,10 +1,10 @@
 package Models
 
 type Repetition struct {
-	StartPreActiveTime int64 	`json:"startPreActiveTime"`
-	StartTime int64				`json:"startTime"`
-	EndTime int64				`json:"endTime"`
-	Terminate bool				`json:"Terminate"`
-	StartJoinTime int64			`json:"startJoinTime"`
-	EndJoinTime int64			`json:"endJoinTime"`
+	StartPreActiveTime int64 	`bson:"StartPreActiveTime" json:"startPreActiveTime"`
+	StartTime int64				`bson:"StartTime" json:"startTime"`
+	EndTime int64				`bson:"EndTime" json:"endTime"`
+	Terminate bool				`bson:"Terminate" json:"Terminate"`
+	StartJoinTime int64			`bson:"StartJoinTime" json:"startJoinTime"`
+	EndJoinTime int64			`bson:"EndJoinTime" json:"endJoinTime"`
 }

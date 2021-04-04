@@ -1,6 +1,7 @@
 package Models
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
@@ -9,11 +10,11 @@ import (
 type UserEvent struct {
 	ID primitive.ObjectID  		`bson:"_id" json:"id"`
 	UUID string 		   		`bson:"UUID" json:"uuid"`
-	GlobalUniqueId string  		`json:"globalUniqueId"`
-	GamePackageName string 		`json:"gamePackageName"`
-	Env string 			   		`json:"env"`
-	MarketName string 	   		`json:"marketName"`
-	UserEventData UserEventData	`json:"userEventData"`
+	GlobalUniqueId string  		`bson:"GlobalUniqueId" json:"globalUniqueId"`
+	GamePackageName string 		`bson:"GamePackageName" json:"gamePackageName"`
+	Env string 			   		`bson:"Env" json:"env"`
+	MarketName string 	   		`bson:"MarketName" json:"marketName"`
+	UserEventData UserEventData	`bson:"UserEventData" json:"userEventData"`
 }
 
 type User_Event_Handler interface {
@@ -41,4 +42,15 @@ func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Success", "id": res.InsertedID})
+}
+
+func (UE UserEvent) GetAllUserEvents (ctx *gin.Context){
+	UserEvent, err := userModel.FindAllUES("UserEvent")
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		ctx.Abort()
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "UserEvent": UserEvent})
+	return
 }
