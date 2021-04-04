@@ -200,7 +200,7 @@ func (event Event) DeleteById(colName string, id string) (*Event, *Errors.RestEr
 	collection := db.GetCollection(colName)
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		ServerError := Errors.ServerError("FAiled to create")
+		ServerError := Errors.ServerError("Failed to create")
 		log.Printf("Failed to create object id from hex %v", id)
 		return nil, ServerError
 	}

@@ -11,6 +11,10 @@ func CreateUEController(ctx *gin.Context){
 	user_event.AddOneUserEvent(ctx)
 }
 
-func GetAllUESControllers(ctx *gin.Context){
+func GetAllUESController(ctx *gin.Context){
 	user_event.GetAllUserEvents(ctx)
+}
+
+func DeleteOneUEController(ctx *gin.Context){
+	user_event.DeleteOneUserEvents(ctx)
 }

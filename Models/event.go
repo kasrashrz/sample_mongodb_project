@@ -84,9 +84,9 @@ func (event Event) AddOneEvent(ctx *gin.Context){
 func (event Event) DeleteOneEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.DeleteById("Events",id)
+		event, err := userModel.DeleteById("Event",id)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Error to delete event", "error": err})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			ctx.Abort()
 			return
 		}
