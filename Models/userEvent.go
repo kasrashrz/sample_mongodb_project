@@ -35,9 +35,7 @@ func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
 	}
 
 	res, err := user.AddUserEvent("UserEvent")
-
 	if err != nil {
-		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
@@ -48,8 +46,6 @@ func (UE UserEvent) GetAllUserEvents (ctx *gin.Context){
 	UserEvent, err := userModel.FindAllUES("UserEvent")
 	if err != nil {
 		fmt.Println(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
-		ctx.Abort()
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "UserEvent": UserEvent})
 	return

@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"kasra_medrick.com/mongo/Configs/db"
+	"kasra_medrick.com/mongo/Utils/Errors"
 	"log"
 	"time"
 )
@@ -26,26 +27,28 @@ type MethodHandler interface {
 	CheckUserEvent()
 }
 
-func (event Event) GetByID(colName string, id string) (*Event, error) {
+func (event Event) GetByID(colName string, id string) (*Event, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
+		ServerError := Errors.ServerError("Something Went Wrong")
 		log.Printf("Failed to create object id from hex %v", id)
-		return nil, err
+		return nil, ServerError
 	}
 	var result Event
 	err = collection.FindOne(ctx, bson.M{"_id": docID}).Decode(&result)
 	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
 		log.Printf("Unable find user by id %f", err)
-		return nil, err
+		return nil, BadReqError
 	}
 	return &result, nil
 }
 
-func (event *Event) FindAll (colName string) ([]Event, error) {
+func (event *Event) FindAll (colName string) ([]Event, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -53,8 +56,9 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	var result []Event
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
 		log.Printf("Unable find user by id %f", err)
-		return nil, err
+		return nil, BadReqError
 	}
 	if err = cursor.All(ctx, &result); err != nil {
 		log.Fatal(err)
@@ -62,7 +66,7 @@ func (event *Event) FindAll (colName string) ([]Event, error) {
 	return result, nil
 }
 
-func (event *Event) FindAllUES (colName string) ([]UserEvent, error) {
+func (event *Event) FindAllUES (colName string) ([]UserEvent, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -70,8 +74,9 @@ func (event *Event) FindAllUES (colName string) ([]UserEvent, error) {
 	var result []UserEvent
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
+		BadReqError := Errors.BadRequest("invalid ID")
 		log.Printf("Unable find user by id %f", err)
-		return nil, err
+		return nil, BadReqError
 	}
 	if err = cursor.All(ctx, &result); err != nil {
 		log.Fatal(err)
@@ -79,21 +84,22 @@ func (event *Event) FindAllUES (colName string) ([]UserEvent, error) {
 	return result, nil
 }
 
-func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, error){
+func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.RestError){
 	var event Event
 	err := ctx.BindJSON(&event)
 	fmt.Println(event)
 	if err != nil {
+		BadReqError := Errors.BadRequest("Unable To Parse Body")
 		log.Printf("Unable to parse body %f", err)
-		return Event{}, err
+		return Event{}, BadReqError
 	}
 
 	if len(id) > 0 {
 		docID, err := primitive.ObjectIDFromHex(id)
-
 		if err != nil {
+			ServerError := Errors.ServerError("Can't Create object id")
 			log.Printf("Failed to create object id from hex %v", id)
-			return Event{}, err
+			return Event{}, ServerError
 		}
 		event.ID = docID
 	}
@@ -101,21 +107,22 @@ func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, error){
 	return event, nil
 }
 
-func (events Event) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, error) {
+func (events Event) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, *Errors.RestError) {
 	var UE UserEvent
 	err := ctx.BindJSON(&UE)
 	fmt.Println(UE)
 	if err != nil {
+		BadReqError := Errors.BadRequest("Unable To Parse Body")
 		log.Printf("Unable to parse body %f", err)
-		return UserEvent{}, err
+		return UserEvent{}, BadReqError
 	}
 
 	if len(id) > 0 {
 		docID, err := primitive.ObjectIDFromHex(id)
-
 		if err != nil {
+			ServerError := Errors.ServerError("Can't Create object id")
 			log.Printf("Failed to create object id from hex %v", id)
-			return UserEvent{}, err
+			return UserEvent{}, ServerError
 		}
 		UE.ID = docID
 	}
@@ -123,7 +130,7 @@ func (events Event) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, err
 	return UE, nil
 }
 
-func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
+func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -143,17 +150,17 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, error) {
 			EndJoinTime:        event.Repetition.EndJoinTime,
 		},
 	}
-	//res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env})
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
+		ServerError := Errors.ServerError("Failed To Insert")
 		log.Printf("Failed to insert user into DB %f", err)
-		return nil, err
+		return nil, ServerError
 	}
 	log.Printf("Successfully inserted user %f", res.InsertedID)
 	return res, nil
 }
 
-func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, error) {
+func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -178,33 +185,36 @@ func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, erro
 	//res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env})
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
+		ServerError := Errors.ServerError("Failed to insert")
 		log.Printf("Failed to insert user into DB %f", err)
-		return nil, err
+		return nil, ServerError
 	}
 	log.Printf("Successfully inserted user %f", res.InsertedID)
 	return res, nil
 }
 
-func (event Event) DeleteById(colName string, id string) (*Event, error) {
+func (event Event) DeleteById(colName string, id string) (*Event, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
 	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
+		ServerError := Errors.ServerError("FAiled to create")
 		log.Printf("Failed to create object id from hex %v", id)
-		return nil, err
+		return nil, ServerError
 	}
 	var result Event
 	err = collection.FindOneAndDelete(ctx, bson.M{"_id": docID}).Decode(&result)
 	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
 		log.Printf("Unable find user by id %f", err)
-		return nil, err
+		return nil, BadReqError
 	}
 	return &result, nil
 }
 
-func (events Event) Update(event Event,colName string,EventId string)(*mongo.UpdateResult, error){
+func (events Event) Update(event Event,colName string,EventId string)(*mongo.UpdateResult, *Errors.RestError){
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -212,8 +222,9 @@ func (events Event) Update(event Event,colName string,EventId string)(*mongo.Upd
 	id, err := primitive.ObjectIDFromHex(EventId)
 	filter := bson.M{"_id": id}
 	if err != nil {
+		ServerError := Errors.ServerError("failed to update")
 		log.Printf("Faild to update id %v %v", event.ID, err)
-		return nil, err
+		return nil, ServerError
 	}
 	update :=  bson.D{
 		{"$set", bson.D{
@@ -231,8 +242,9 @@ func (events Event) Update(event Event,colName string,EventId string)(*mongo.Upd
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
+		ServerError := Errors.ServerError("Failed To update")
 		log.Printf("Faild to update id %v %v", event.ID, err)
-		return nil, err
+		return nil, ServerError
 	}
-	return res, err
+	return res, nil
 }
