@@ -54,6 +54,23 @@ func (UE UserEvent) GetAllUserEvents (ctx *gin.Context){
 	return
 }
 
+func (UE UserEvent) GetOneUserEvent (ctx *gin.Context){
+	id := ctx.Param("id")
+	if id != "" {
+		event, err := userModel.GetUEByID("UserEvent",id)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			ctx.Abort()
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "event": event})
+		return
+	}
+	ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+	ctx.Abort()
+	return
+}
+
 func (UE UserEvent) DeleteOneUserEvents (ctx *gin.Context){
 	id := ctx.Param("id")
 	if id != "" {

@@ -21,10 +21,32 @@ type MethodHandler interface {
 	FindAll()
 	Insert()
 	Update()
+	GetUEByID()
 	AddEvent()
 	CheckEvent()
 	AddUserEvent()
 	CheckUserEvent()
+}
+
+func (event Event) GetUEByID (colName string, id string) (*UserEvent, *Errors.RestError) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	docID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		ServerError := Errors.ServerError("Something Went Wrong")
+		log.Printf("Failed to create object id from hex %v", id)
+		return nil, ServerError
+	}
+	var result UserEvent
+	err = collection.FindOne(ctx, bson.M{"_id": docID}).Decode(&result)
+	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
+		log.Printf("Unable find user by id %f", err)
+		return nil, BadReqError
+	}
+	return &result, nil
 }
 
 func (event Event) GetByID(colName string, id string) (*Event, *Errors.RestError) {

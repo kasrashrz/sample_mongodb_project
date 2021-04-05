@@ -18,3 +18,7 @@ func GetAllUESController(ctx *gin.Context){
 func DeleteOneUEController(ctx *gin.Context){
 	user_event.DeleteOneUserEvents(ctx)
 }
+
+func FindOneUEController(ctx *gin.Context){
+	user_event.GetOneUserEvent(ctx)
+}
