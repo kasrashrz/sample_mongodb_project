@@ -24,8 +24,8 @@ type MethodHandler interface {
 	GetUEByID()
 	AddEvent()
 	CheckEvent()
-	AddUserEvent()
 	CheckUserEvent()
+	AddUserEvent()
 }
 
 func (event Event) GetUEByID (colName string, id string) (*UserEvent, *Errors.RestError) {
@@ -129,7 +129,7 @@ func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.Rest
 	return event, nil
 }
 
-func (events Event) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, *Errors.RestError) {
+func (UES UserEvent) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, *Errors.RestError) {
 	var UE UserEvent
 	err := ctx.BindJSON(&UE)
 	fmt.Println(UE)
@@ -270,3 +270,42 @@ func (events Event) Update(event Event,colName string,EventId string)(*mongo.Upd
 	}
 	return res, nil
 }
+
+func (UES UserEvent) UpdateUserEvent (UE UserEvent,colName string,EventId string)(*mongo.UpdateResult, *Errors.RestError){
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection :=  db.GetCollection(colName)
+	id, err := primitive.ObjectIDFromHex(EventId)
+	filter := bson.M{"_id": id}
+	if err != nil {
+		ServerError := Errors.ServerError("failed to update")
+		log.Printf("Faild to update id %v %v", UE.ID, err)
+		return nil, ServerError
+	}
+	update :=  bson.D{
+		{"$set", bson.D{
+			{"UUID", UE.UUID},
+			{"GlobalUniqueId", UE.GlobalUniqueId},
+			{"GamePackageName", UE.GamePackageName},
+			{"Env", UE.Env},
+			{"MarketName", UE.MarketName},
+			{"UserEventData.EventId", UE.UserEventData.EventId},
+			{"UserEventData.UserEventStage", UE.UserEventData.UserEventStage},
+			{"UserEventData.Score", UE.UserEventData.Score},
+			{"UserEventData.JoinTime", UE.UserEventData.JoinTime},
+			{"UserEventData.EndTime", UE.UserEventData.EndTime},
+			{"UserEventData.StartTime", UE.UserEventData.StartTime},
+			{"UserEventData.PreActiveTime", UE.UserEventData.PreActiveTime},
+
+		}},
+	}
+	res, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		ServerError := Errors.ServerError("Failed To update")
+		log.Printf("Faild to update id %v %v", UE.ID, err)
+		return nil, ServerError
+	}
+	return res, nil
+}
+

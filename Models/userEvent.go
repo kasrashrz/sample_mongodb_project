@@ -26,7 +26,7 @@ type User_Event_Handler interface {
 }
 
 func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
-	user, err := userModel.CheckUserEvent(ctx, "")
+	user, err := UE.CheckUserEvent(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -85,5 +85,32 @@ func (UE UserEvent) DeleteOneUserEvents (ctx *gin.Context){
 	}
 	ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 	ctx.Abort()
+	return
+}
+
+func (UE UserEvent) UpdateOneUserEvent (ctx *gin.Context){
+	id := ctx.Param("id")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		ctx.Abort()
+		return
+	}
+
+	SpecEvent, err := UE.CheckUserEvent(ctx, ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	_, err = UE.UpdateUserEvent(SpecEvent,"UserEvent", id)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "User successfully updated ", "user": SpecEvent.ID.Hex()})
 	return
 }

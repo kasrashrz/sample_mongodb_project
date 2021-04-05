@@ -22,3 +22,7 @@ func DeleteOneUEController(ctx *gin.Context){
 func FindOneUEController(ctx *gin.Context){
 	user_event.GetOneUserEvent(ctx)
 }
+
+func UpdateOneUEController(ctx *gin.Context){
+	user_event.UpdateOneUserEvent(ctx)
+}
