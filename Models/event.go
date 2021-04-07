@@ -62,8 +62,8 @@ func (events Event) GetAllEvents(ctx *gin.Context){
 		return
 }
 
-func (event Event) AddOneEvent(ctx *gin.Context){
-	user, err := userModel.CheckEvent(ctx, "")
+func (events Event) AddOneEvent(ctx *gin.Context){
+	event, err := userModel.CheckEvent(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
@@ -71,7 +71,7 @@ func (event Event) AddOneEvent(ctx *gin.Context){
 		return
 	}
 
-	res, err := user.AddEvent("Events")
+	res, err := event.AddEvent("Events")
 
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
@@ -121,7 +121,7 @@ func (event Event) UpdateOneEvent(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "User successfully updated ", "user": SpecEvent.ID.Hex()})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Event successfully updated ", "event": SpecEvent.ID.Hex()})
 	ctx.Abort()
 	return
 }

@@ -43,7 +43,7 @@ func (event Event) GetUEByID (colName string, id string) (*UserEvent, *Errors.Re
 	err = collection.FindOne(ctx, bson.M{"_id": docID}).Decode(&result)
 	if err != nil {
 		BadReqError := Errors.BadRequest("Invalid ID")
-		log.Printf("Unable find user by id %f", err)
+		log.Printf("Unable find event by id %f", err)
 		return nil, BadReqError
 	}
 	return &result, nil
@@ -64,7 +64,7 @@ func (event Event) GetByID(colName string, id string) (*Event, *Errors.RestError
 	err = collection.FindOne(ctx, bson.M{"_id": docID}).Decode(&result)
 	if err != nil {
 		BadReqError := Errors.BadRequest("Invalid ID")
-		log.Printf("Unable find user by id %f", err)
+		log.Printf("Unable find event by id %f", err)
 		return nil, BadReqError
 	}
 	return &result, nil
@@ -79,7 +79,7 @@ func (event *Event) FindAll (colName string) ([]Event, *Errors.RestError) {
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		BadReqError := Errors.BadRequest("Invalid ID")
-		log.Printf("Unable find user by id %f", err)
+		log.Printf("Unable find event by id %f", err)
 		return nil, BadReqError
 	}
 	if err = cursor.All(ctx, &result); err != nil {
@@ -97,7 +97,7 @@ func (event *Event) FindAllUES (colName string) ([]UserEvent, *Errors.RestError)
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		BadReqError := Errors.BadRequest("invalid ID")
-		log.Printf("Unable find user by id %f", err)
+		log.Printf("Unable find event by id %f", err)
 		return nil, BadReqError
 	}
 	if err = cursor.All(ctx, &result); err != nil {
@@ -175,10 +175,10 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, *Errors.Re
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To Insert")
-		log.Printf("Failed to insert user into DB %f", err)
+		log.Printf("Failed to insert event into DB %f", err)
 		return nil, ServerError
 	}
-	log.Printf("Successfully inserted user %f", res.InsertedID)
+	log.Printf("Successfully inserted event %f", res.InsertedID)
 	return res, nil
 }
 
@@ -208,10 +208,10 @@ func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, *Err
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed to insert")
-		log.Printf("Failed to insert user into DB %f", err)
+		log.Printf("Failed to insert event into DB %f", err)
 		return nil, ServerError
 	}
-	log.Printf("Successfully inserted user %f", res.InsertedID)
+	log.Printf("Successfully inserted event %f", res.InsertedID)
 	return res, nil
 }
 
@@ -230,7 +230,7 @@ func (event Event) DeleteById(colName string, id string) (*Event, *Errors.RestEr
 	err = collection.FindOneAndDelete(ctx, bson.M{"_id": docID}).Decode(&result)
 	if err != nil {
 		BadReqError := Errors.BadRequest("Invalid ID")
-		log.Printf("Unable find user by id %f", err)
+		log.Printf("Unable find Event by id %f", err)
 		return nil, BadReqError
 	}
 	return &result, nil
@@ -297,7 +297,6 @@ func (UES UserEvent) UpdateUserEvent (UE UserEvent,colName string,EventId string
 			{"UserEventData.EndTime", UE.UserEventData.EndTime},
 			{"UserEventData.StartTime", UE.UserEventData.StartTime},
 			{"UserEventData.PreActiveTime", UE.UserEventData.PreActiveTime},
-
 		}},
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)
