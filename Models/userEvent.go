@@ -8,13 +8,13 @@ import (
 )
 
 type UserEvent struct {
-	ID primitive.ObjectID  		`bson:"_id" json:"id"`
-	UUID string 		   		`bson:"UUID" json:"uuid"`
-	GlobalUniqueId string  		`bson:"GlobalUniqueId" json:"globalUniqueId"`
-	GamePackageName string 		`bson:"GamePackageName" json:"gamePackageName"`
-	Env string 			   		`bson:"Env" json:"env"`
-	MarketName string 	   		`bson:"MarketName" json:"marketName"`
-	UserEventData UserEventData	`bson:"UserEventData" json:"userEventData"`
+	ID              primitive.ObjectID `bson:"_id" json:"id"`
+	UUID            string             `bson:"UUID" json:"uuid"`
+	GlobalUniqueId  string             `bson:"GlobalUniqueId" json:"globalUniqueId"`
+	GamePackageName string             `bson:"GamePackageName" json:"gamePackageName"`
+	Env             string             `bson:"Env" json:"env"`
+	MarketName      string             `bson:"MarketName" json:"marketName"`
+	UserEventData   UserEventData      `bson:"UserEventData" json:"userEventData"`
 }
 
 type User_Event_Handler interface {
@@ -25,7 +25,7 @@ type User_Event_Handler interface {
 	UpdateOneUserEvents(ctx *gin.Context)
 }
 
-func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
+func (UE UserEvent) AddOneUserEvent(ctx *gin.Context) {
 	user, err := UE.CheckUserEvent(ctx, "")
 
 	if err != nil {
@@ -45,7 +45,7 @@ func (UE UserEvent) AddOneUserEvent (ctx *gin.Context){
 	return
 }
 
-func (UE UserEvent) GetAllUserEvents (ctx *gin.Context){
+func (UE UserEvent) GetAllUserEvents(ctx *gin.Context) {
 	UserEvent, err := userModel.FindAllUES("UserEvent")
 	if err != nil {
 		fmt.Println(err)
@@ -54,10 +54,10 @@ func (UE UserEvent) GetAllUserEvents (ctx *gin.Context){
 	return
 }
 
-func (UE UserEvent) GetOneUserEvent (ctx *gin.Context){
+func (UE UserEvent) GetOneUserEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.GetUEByID("UserEvent",id)
+		event, err := userModel.GetUEByID("UserEvent", id)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			ctx.Abort()
@@ -71,10 +71,10 @@ func (UE UserEvent) GetOneUserEvent (ctx *gin.Context){
 	return
 }
 
-func (UE UserEvent) DeleteOneUserEvents (ctx *gin.Context){
+func (UE UserEvent) DeleteOneUserEvents(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.DeleteById("UserEvent",id)
+		event, err := userModel.DeleteById("UserEvent", id)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			ctx.Abort()
@@ -88,7 +88,7 @@ func (UE UserEvent) DeleteOneUserEvents (ctx *gin.Context){
 	return
 }
 
-func (UE UserEvent) UpdateOneUserEvent (ctx *gin.Context){
+func (UE UserEvent) UpdateOneUserEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -103,7 +103,7 @@ func (UE UserEvent) UpdateOneUserEvent (ctx *gin.Context){
 		return
 	}
 
-	_, err = UE.UpdateUserEvent(SpecEvent,"UserEvent", id)
+	_, err = UE.UpdateUserEvent(SpecEvent, "UserEvent", id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})

@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"kasra_medrick.com/mongo/Configs/db"
+	"kasra_medrick.com/mongo/Utils"
 	"kasra_medrick.com/mongo/Utils/Errors"
 	"log"
 	"time"
@@ -28,7 +29,7 @@ type MethodHandler interface {
 	AddUserEvent()
 }
 
-func (event Event) GetUEByID (colName string, id string) (*UserEvent, *Errors.RestError) {
+func (event Event) GetUEByID(colName string, id string) (*UserEvent, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -70,7 +71,7 @@ func (event Event) GetByID(colName string, id string) (*Event, *Errors.RestError
 	return &result, nil
 }
 
-func (event *Event) FindAll (colName string) ([]Event, *Errors.RestError) {
+func (event *Event) FindAll(colName string) ([]Event, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -88,7 +89,7 @@ func (event *Event) FindAll (colName string) ([]Event, *Errors.RestError) {
 	return result, nil
 }
 
-func (event *Event) FindAllUES (colName string) ([]UserEvent, *Errors.RestError) {
+func (event *Event) FindAllUES(colName string) ([]UserEvent, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -106,7 +107,7 @@ func (event *Event) FindAllUES (colName string) ([]UserEvent, *Errors.RestError)
 	return result, nil
 }
 
-func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.RestError){
+func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.RestError) {
 	var event Event
 	err := ctx.BindJSON(&event)
 	fmt.Println(event)
@@ -126,10 +127,13 @@ func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.Rest
 		event.ID = docID
 	}
 	//TODO : CONTROLLER LAYER (VALIDATORS)
+	for _, i := range event.Repetition {
+		i.RandomRepetitionUuId = Utils.RandomId()
+	}
 	return event, nil
 }
 
-func (UES UserEvent) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, *Errors.RestError) {
+func (UES UserEvent) CheckUserEvent(ctx *gin.Context, id string) (UserEvent, *Errors.RestError) {
 	var UE UserEvent
 	err := ctx.BindJSON(&UE)
 	fmt.Println(UE)
@@ -152,20 +156,21 @@ func (UES UserEvent) CheckUserEvent (ctx *gin.Context, id string) (UserEvent, *E
 	return UE, nil
 }
 
-func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, *Errors.RestError) {
+func (event Event) AddEvent(colName string) (*mongo.InsertOneResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
 	ins := Event{
-		ID: 		  primitive.NewObjectID(),
+		ID:           primitive.NewObjectID(),
 		Name:         event.Name,
 		Env:          event.Env,
 		EventEndTime: event.EventEndTime,
 	}
-	for _, repetitions := range event.Repetition{
-		ins.Repetition =  append(event.Repetition,repetitions)
+	for _, repetitions := range event.Repetition {
+		ins.Repetition = append(ins.Repetition, repetitions)
 	}
+
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To Insert")
@@ -176,7 +181,7 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, *Errors.Re
 	return res, nil
 }
 
-func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, *Errors.RestError) {
+func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
@@ -188,7 +193,7 @@ func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, *Err
 		GamePackageName: UE.GamePackageName,
 		Env:             UE.Env,
 		MarketName:      UE.MarketName,
-		UserEventData:   UserEventData{
+		UserEventData: UserEventData{
 			EventId:        UE.UserEventData.EventId,
 			UserEventStage: UE.UserEventData.UserEventStage,
 			Score:          UE.UserEventData.Score,
@@ -229,11 +234,11 @@ func (event Event) DeleteById(colName string, id string) (*Event, *Errors.RestEr
 	return &result, nil
 }
 
-func (events Event) Update(event Event,colName string,EventId string)(*mongo.UpdateResult, *Errors.RestError){
+func (events Event) Update(event Event, colName string, EventId string) (*mongo.UpdateResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection :=  db.GetCollection(colName)
+	collection := db.GetCollection(colName)
 	id, err := primitive.ObjectIDFromHex(EventId)
 	filter := bson.M{"_id": id}
 	if err != nil {
@@ -241,7 +246,7 @@ func (events Event) Update(event Event,colName string,EventId string)(*mongo.Upd
 		log.Printf("Faild to update id %v %v", event.ID, err)
 		return nil, ServerError
 	}
-	update :=  bson.D{
+	update := bson.D{
 		{"$set", bson.D{
 			{"Name", event.Name},
 			{"Env", event.Env},
@@ -263,11 +268,11 @@ func (events Event) Update(event Event,colName string,EventId string)(*mongo.Upd
 	return res, nil
 }
 
-func (UES UserEvent) UpdateUserEvent (UE UserEvent,colName string,EventId string)(*mongo.UpdateResult, *Errors.RestError){
+func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, EventId string) (*mongo.UpdateResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	collection :=  db.GetCollection(colName)
+	collection := db.GetCollection(colName)
 	id, err := primitive.ObjectIDFromHex(EventId)
 	filter := bson.M{"_id": id}
 	if err != nil {
@@ -275,7 +280,7 @@ func (UES UserEvent) UpdateUserEvent (UE UserEvent,colName string,EventId string
 		log.Printf("Faild to update id %v %v", UE.ID, err)
 		return nil, ServerError
 	}
-	update :=  bson.D{
+	update := bson.D{
 		{"$set", bson.D{
 			{"UUID", UE.UUID},
 			{"GlobalUniqueId", UE.GlobalUniqueId},
@@ -299,4 +304,3 @@ func (UES UserEvent) UpdateUserEvent (UE UserEvent,colName string,EventId string
 	}
 	return res, nil
 }
-

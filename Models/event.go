@@ -5,11 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"kasra_medrick.com/mongo/Utils"
 	"net/http"
 )
 
 var client *mongo.Client
-type  EventEndTimeType uint
+
+type EventEndTimeType uint
+
 var userModel = new(Event)
 
 const (
@@ -18,11 +21,11 @@ const (
 )
 
 type Event struct {
-	ID 		  primitive.ObjectID  `bson:"_id" json:"id"`
-	Name string	     			  `bson:"Name" json:"name"`
-	Env string 					  `bson:"Env" json:"env"`
-    EventEndTime string 		  `bson:"EventEndTime" json:"eventEndTime"`
-	Repetition []Repetition 		  `bson:"Repetition" json:"repetition"`
+	ID           primitive.ObjectID `bson:"_id" json:"id"`
+	Name         string             `bson:"Name" json:"name"`
+	Env          string             `bson:"Env" json:"env"`
+	EventEndTime string             `bson:"EventEndTime" json:"eventEndTime"`
+	Repetition   []Repetition       `bson:"Repetition" json:"repetition"`
 }
 
 type Event_Handler interface {
@@ -36,7 +39,7 @@ type Event_Handler interface {
 func (event Event) GetOneEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.GetByID("Events",id)
+		event, err := userModel.GetByID("Events", id)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Error to retrieve event", "error": err})
 			ctx.Abort()
@@ -50,18 +53,18 @@ func (event Event) GetOneEvent(ctx *gin.Context) {
 	return
 }
 
-func (events Event) GetAllEvents(ctx *gin.Context){
-		event, err := userModel.FindAll("Events")
-		if err != nil {
-			fmt.Println(err)
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
-			ctx.Abort()
-		}
-		ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "event": event})
-		return
+func (events Event) GetAllEvents(ctx *gin.Context) {
+	event, err := userModel.FindAll("Events")
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		ctx.Abort()
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "event": event})
+	return
 }
 
-func (events Event) AddOneEvent(ctx *gin.Context){
+func (events Event) AddOneEvent(ctx *gin.Context) {
 	event, err := userModel.CheckEvent(ctx, "")
 
 	if err != nil {
@@ -76,14 +79,14 @@ func (events Event) AddOneEvent(ctx *gin.Context){
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-
+	fmt.Println(Utils.RandomId())
 	ctx.JSON(http.StatusOK, gin.H{"message": "Success", "id": res.InsertedID})
 }
 
 func (event Event) DeleteOneEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.DeleteById("Event",id)
+		event, err := userModel.DeleteById("Events", id)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			ctx.Abort()
@@ -112,7 +115,7 @@ func (event Event) UpdateOneEvent(ctx *gin.Context) {
 		return
 	}
 
-	_, err = event.Update(SpecEvent,"Events", id)
+	_, err = event.Update(SpecEvent, "Events", id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
