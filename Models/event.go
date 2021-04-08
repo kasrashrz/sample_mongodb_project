@@ -20,10 +20,9 @@ const (
 type Event struct {
 	ID 		  primitive.ObjectID  `bson:"_id" json:"id"`
 	Name string	     			  `bson:"Name" json:"name"`
-	Market_name string 			  `bson:"Market_Name" json:"market_name"`
 	Env string 					  `bson:"Env" json:"env"`
     EventEndTime string 		  `bson:"EventEndTime" json:"eventEndTime"`
-	Repetition Repetition 		  `bson:"Repetition" json:"repetition"`
+	Repetition []Repetition 		  `bson:"Repetition" json:"repetition"`
 }
 
 type Event_Handler interface {

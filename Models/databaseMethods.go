@@ -160,17 +160,11 @@ func (event Event) AddEvent(colName string) ( *mongo.InsertOneResult, *Errors.Re
 	ins := Event{
 		ID: 		  primitive.NewObjectID(),
 		Name:         event.Name,
-		Market_name:  event.Market_name,
 		Env:          event.Env,
 		EventEndTime: event.EventEndTime,
-		Repetition:   Repetition{
-			StartPreActiveTime: event.Repetition.StartPreActiveTime,
-			StartTime:          event.Repetition.StartTime,
-			EndTime:            event.Repetition.EndTime,
-			Terminate:          event.Repetition.Terminate,
-			StartJoinTime:      event.Repetition.StartJoinTime,
-			EndJoinTime:        event.Repetition.EndJoinTime,
-		},
+	}
+	for _, repetitions := range event.Repetition{
+		ins.Repetition =  append(event.Repetition,repetitions)
 	}
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
@@ -204,7 +198,6 @@ func (UE UserEvent) AddUserEvent (colName string) ( *mongo.InsertOneResult, *Err
 			PreActiveTime:  UE.UserEventData.PreActiveTime,
 		},
 	}
-	//res, err := collection.InsertOne(ctx, bson.M{"Name": event.Name, "Market_name": event.Market_name, "Env" : event.Env})
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed to insert")
@@ -251,15 +244,14 @@ func (events Event) Update(event Event,colName string,EventId string)(*mongo.Upd
 	update :=  bson.D{
 		{"$set", bson.D{
 			{"Name", event.Name},
-			{"Market_Name", event.Market_name},
 			{"Env", event.Env},
 			{"EventEndTime", event.EventEndTime},
-			{"Repetition.StartPreActiveTime", event.Repetition.StartPreActiveTime},
-			{"Repetition.StartTime", event.Repetition.StartTime},
-			{"Repetition.EndTime", event.Repetition.EndTime},
-			{"Repetition.Terminate", event.Repetition.Terminate},
-			{"Repetition.StartJoinTime", event.Repetition.StartJoinTime},
-			{"Repetition.EndJoinTime", event.Repetition.EndJoinTime},
+			//{"Repetition.StartPreActiveTime", event.Repetition.StartPreActiveTime},
+			//{"Repetition.StartTime", event.Repetition.StartTime},
+			//{"Repetition.EndTime", event.Repetition.EndTime},
+			//{"Repetition.Terminate", event.Repetition.Terminate},
+			//{"Repetition.StartJoinTime", event.Repetition.StartJoinTime},
+			//{"Repetition.EndJoinTime", event.Repetition.EndJoinTime},
 		}},
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)
