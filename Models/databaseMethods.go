@@ -11,6 +11,7 @@ import (
 	"kasra_medrick.com/mongo/Configs/db"
 	"kasra_medrick.com/mongo/Utils"
 	"kasra_medrick.com/mongo/Utils/Errors"
+	"kasra_medrick.com/mongo/Utils/dates"
 	"log"
 	"time"
 )
@@ -127,6 +128,8 @@ func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.Rest
 	}
 	for _, i := range event.Repetition {
 		i.RandomRepetitionUuId = Utils.RandomId()
+		i.StartTime = dates.EpchoConvertor()
+
 	}
 	fmt.Println(event)
 	return event, nil
@@ -168,6 +171,7 @@ func (event Event) AddEvent(colName string) (*mongo.InsertOneResult, *Errors.Res
 	}
 	for _, repetitions := range event.Repetition {
 		repetitions.RandomRepetitionUuId = Utils.RandomId()
+		repetitions.StartTime = dates.EpchoConvertor()
 		ins.Repetition = append(ins.Repetition, repetitions)
 	}
 

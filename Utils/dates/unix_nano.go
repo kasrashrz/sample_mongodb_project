@@ -1,10 +1,11 @@
 package dates
 
-import(
+import (
 	"time"
-	"fmt"
 )
 
-func time() int {
-	
+func EpchoConvertor() int64 {
+	now := time.Now()
+	secs := now.Unix()
+	return secs
 }
