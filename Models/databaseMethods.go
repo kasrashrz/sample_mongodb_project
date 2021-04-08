@@ -110,7 +110,6 @@ func (event *Event) FindAllUES(colName string) ([]UserEvent, *Errors.RestError) 
 func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.RestError) {
 	var event Event
 	err := ctx.BindJSON(&event)
-	fmt.Println(event)
 	if err != nil {
 		BadReqError := Errors.BadRequest("Unable To Parse Body")
 		log.Printf("Unable to parse body %f", err)
@@ -126,10 +125,10 @@ func (events Event) CheckEvent(ctx *gin.Context, id string) (Event, *Errors.Rest
 		}
 		event.ID = docID
 	}
-	//TODO : CONTROLLER LAYER (VALIDATORS)
 	for _, i := range event.Repetition {
 		i.RandomRepetitionUuId = Utils.RandomId()
 	}
+	fmt.Println(event)
 	return event, nil
 }
 
@@ -168,6 +167,7 @@ func (event Event) AddEvent(colName string) (*mongo.InsertOneResult, *Errors.Res
 		EventEndTime: event.EventEndTime,
 	}
 	for _, repetitions := range event.Repetition {
+		repetitions.RandomRepetitionUuId = Utils.RandomId()
 		ins.Repetition = append(ins.Repetition, repetitions)
 	}
 
