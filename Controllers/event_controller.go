@@ -26,3 +26,7 @@ func DeleteOneEventController(ctx *gin.Context) {
 func UpdateById(ctx *gin.Context) {
 	event.UpdateOneEvent(ctx)
 }
+
+func TerminateEventController(ctx *gin.Context){
+	event.Terminate(ctx)
+}

@@ -20,10 +20,12 @@ const (
 	relative
 )
 
+
 type Event struct {
 	ID           primitive.ObjectID `bson:"_id" json:"id"`
 	Name         string             `bson:"Name" json:"name"`
 	Env          string             `bson:"Env" json:"env"`
+	//States 		 map[string]
 	EventEndTime string             `bson:"EventEndTime" json:"eventEndTime"`
 	Repetition   []Repetition       `bson:"Repetition" json:"repetition"`
 }
@@ -34,6 +36,8 @@ type Event_Handler interface {
 	GetAllEvents(ctx *gin.Context)
 	DeleteOneEvent(ctx *gin.Context)
 	UpdateOneEvent(ctx *gin.Context)
+	//	APIS //
+	Terminate(ctx *gin.Context)
 }
 
 func (event Event) GetOneEvent(ctx *gin.Context) {
@@ -124,6 +128,28 @@ func (event Event) UpdateOneEvent(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Event successfully updated ", "event": SpecEvent.ID.Hex()})
+	ctx.Abort()
+	return
+}
+
+func (event Event) Terminate(ctx *gin.Context) {
+	id := ctx.Param("id")
+	RandomId := ctx.Param("randomId")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		ctx.Abort()
+		return
+	}
+
+	_, err := event.TerminateAPI("Events", id, RandomId)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Event successfully updated ", "event": id})
 	ctx.Abort()
 	return
 }

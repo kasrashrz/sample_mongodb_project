@@ -174,7 +174,6 @@ func (event Event) AddEvent(colName string) (*mongo.InsertOneResult, *Errors.Res
 		repetitions.StartTime = dates.EpchoConvertor()
 		ins.Repetition = append(ins.Repetition, repetitions)
 	}
-
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To Insert")
@@ -250,19 +249,16 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 		log.Printf("Faild to update id %v %v", event.ID, err)
 		return nil, ServerError
 	}
-	update := bson.D{
-		{"$set", bson.D{
-			{"Name", event.Name},
-			{"Env", event.Env},
-			{"EventEndTime", event.EventEndTime},
-			//{"Repetition.StartPreActiveTime", event.Repetition.StartPreActiveTime},
-			//{"Repetition.StartTime", event.Repetition.StartTime},
-			//{"Repetition.EndTime", event.Repetition.EndTime},
-			//{"Repetition.Terminate", event.Repetition.Terminate},
-			//{"Repetition.StartJoinTime", event.Repetition.StartJoinTime},
-			//{"Repetition.EndJoinTime", event.Repetition.EndJoinTime},
-		}},
+	// TODO: FULL UPDATE
+	update := bson.M{
+		"$set": bson.M{
+			"Name": event.Name,
+			"Env":  event.Env,
+			"EventEndTime": event.EventEndTime,
+		},
 	}
+
+	//fmt.Println(update)
 	res, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To update")
@@ -304,6 +300,34 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, EventId strin
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To update")
 		log.Printf("Faild to update id %v %v", UE.ID, err)
+		return nil, ServerError
+	}
+	return res, nil
+}
+
+func (events Event) TerminateAPI(colName string, EventId string, RandomId string) (*mongo.UpdateResult, *Errors.RestError) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	id, err := primitive.ObjectIDFromHex(EventId)
+	filter := bson.M{
+		"Repetition.RandomRepetitionUuid": RandomId,
+	}
+	if err != nil {
+		ServerError := Errors.ServerError("failed to update")
+		log.Printf("Faild to update id %v %v", id, err)
+		return nil, ServerError
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"Repetition.0.Terminate" : "true",
+		},
+	}
+	res, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		ServerError := Errors.ServerError("Failed To update")
+		log.Printf("Faild to update id %v %v", id, err)
 		return nil, ServerError
 	}
 	return res, nil
