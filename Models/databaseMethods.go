@@ -164,11 +164,15 @@ func (event Event) AddEvent(colName string) (*mongo.InsertOneResult, *Errors.Res
 	defer cancel()
 	collection := db.GetCollection(colName)
 	ins := Event{
-		ID:               primitive.NewObjectID(),
-		Name:             event.Name,
-		Env:              event.Env,
-		EventEndType: 	  event.EventEndType,
-		States:           event.States,
+		ID:                             primitive.NewObjectID(),
+		Name:                           event.Name,
+		Env:                            event.Env,
+		EventEndType:                   event.EventEndType,
+		ClientType:                     event.ClientType,
+		PeriodTimeForMiddleJoinTillEnd: event.PeriodTimeForMiddleJoinTillEnd,
+		ConfigVersion:                  event.ConfigVersion,
+		States:                         event.States,
+		VersionMetaData:                event.VersionMetaData,
 	}
 	for _, repetitions := range event.Repetition {
 		repetitions.RandomRepetitionUuId = Utils.RandomId()
@@ -264,7 +268,7 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 	ins := Event{
 		Name:         event.Name,
 		Env:          event.Env,
-		EventEndTime: event.EventEndTime,
+		EventEndType: event.EventEndType,
 		Repetition:   nil,
 	}
 	for _, repetitions := range event.Repetition {
@@ -277,7 +281,7 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 		"$set": bson.M{
 			"Name": event.Name,
 			"Env":  event.Env,
-			"EventEndTime": event.EventEndTime,
+			"EventEndType": event.EventEndType,
 			"Repetition":ins.Repetition,
 		},
 	}
