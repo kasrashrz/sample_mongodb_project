@@ -189,12 +189,24 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
+	EventCollection := db.GetCollection("Events")
+	var result Event
+	EventId,_ := primitive.ObjectIDFromHex(UE.UserEventData.EventId)
+	filter := bson.M{
+		"_id": EventId,
+		}
+	err := EventCollection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	ins := UserEvent{
 		ID:              primitive.NewObjectID(),
 		UUID:            UE.UUID,
 		GlobalUniqueId:  UE.GlobalUniqueId,
 		GamePackageName: UE.GamePackageName,
 		Env:             UE.Env,
+		JoinedEventRepetitionUuId: UE.JoinedEventRepetitionUuId,
 		UserEventData: UserEventData{
 			EventId:        UE.UserEventData.EventId,
 			UserEventStage: UE.UserEventData.UserEventStage,
@@ -295,6 +307,7 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, EventId strin
 			{"GlobalUniqueId", UE.GlobalUniqueId},
 			{"GamePackageName", UE.GamePackageName},
 			{"Env", UE.Env},
+			{"JoinedEventRepetitionUuId", UE.JoinedEventRepetitionUuId},
 			{"UserEventData.EventId", UE.UserEventData.EventId},
 			{"UserEventData.UserEventStage", UE.UserEventData.UserEventStage},
 			{"UserEventData.Score", UE.UserEventData.Score},
@@ -333,6 +346,7 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 		},
 	}
 	res, err := collection.UpdateMany(ctx, filter, update)
+
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To update")
 		log.Printf("Faild to update id %v %v", id, err)

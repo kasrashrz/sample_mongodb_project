@@ -20,14 +20,14 @@ const (
 	relative
 )
 
-
 type Event struct {
-	ID           primitive.ObjectID `bson:"_id" json:"id"`
-	Name         string             `bson:"Name" json:"name"`
-	Env          string             `bson:"Env" json:"env"`
-	//States 		 map[string]
-	EventEndTime string             `bson:"EventEndTime" json:"eventEndTime"`
-	Repetition   []Repetition       `bson:"Repetition" json:"repetition"`
+	ID               primitive.ObjectID     `bson:"_id" json:"id"`
+	Name             string                 `bson:"Name" json:"name"`
+	Env              string                 `bson:"Env" json:"env"`
+	EventEndTimeType string                 `bson:"EventEndTimeType" json:"EventEndTimeType"`
+	States           map[string]interface{} `bson:"States" json:"states"`
+	EventEndTime     string                 `bson:"EventEndTime" json:"eventEndTime"`
+	Repetition       []Repetition           `bson:"Repetition" json:"repetition"`
 }
 
 type Event_Handler interface {
