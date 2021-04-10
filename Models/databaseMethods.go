@@ -249,16 +249,26 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 		log.Printf("Faild to update id %v %v", event.ID, err)
 		return nil, ServerError
 	}
+	ins := Event{
+		Name:         event.Name,
+		Env:          event.Env,
+		EventEndTime: event.EventEndTime,
+		Repetition:   nil,
+	}
+	for _, repetitions := range event.Repetition {
+		repetitions.RandomRepetitionUuId = Utils.RandomId()
+		repetitions.StartTime = dates.EpchoConvertor()
+		ins.Repetition = append(ins.Repetition, repetitions)
+	}
 	// TODO: FULL UPDATE
 	update := bson.M{
 		"$set": bson.M{
 			"Name": event.Name,
 			"Env":  event.Env,
 			"EventEndTime": event.EventEndTime,
+			"Repetition":ins.Repetition,
 		},
 	}
-
-	//fmt.Println(update)
 	res, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To update")
