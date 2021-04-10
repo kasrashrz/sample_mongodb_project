@@ -195,7 +195,6 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 		GlobalUniqueId:  UE.GlobalUniqueId,
 		GamePackageName: UE.GamePackageName,
 		Env:             UE.Env,
-		MarketName:      UE.MarketName,
 		UserEventData: UserEventData{
 			EventId:        UE.UserEventData.EventId,
 			UserEventStage: UE.UserEventData.UserEventStage,
@@ -296,7 +295,6 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, EventId strin
 			{"GlobalUniqueId", UE.GlobalUniqueId},
 			{"GamePackageName", UE.GamePackageName},
 			{"Env", UE.Env},
-			{"MarketName", UE.MarketName},
 			{"UserEventData.EventId", UE.UserEventData.EventId},
 			{"UserEventData.UserEventStage", UE.UserEventData.UserEventStage},
 			{"UserEventData.Score", UE.UserEventData.Score},

@@ -8,13 +8,13 @@ import (
 )
 
 type UserEvent struct {
-	ID              primitive.ObjectID `bson:"_id" json:"id"`
-	UUID            string             `bson:"UUID" json:"uuid"`
-	GlobalUniqueId  string             `bson:"GlobalUniqueId" json:"globalUniqueId"`
-	GamePackageName string             `bson:"GamePackageName" json:"gamePackageName"`
-	Env             string             `bson:"Env" json:"env"`
-	MarketName      string             `bson:"MarketName" json:"marketName"`
-	UserEventData   UserEventData      `bson:"UserEventData" json:"userEventData"`
+	ID                        primitive.ObjectID        `bson:"_id" json:"id"`
+	UUID                      string                    `bson:"UUID" json:"uuid"`
+	GlobalUniqueId            string                    `bson:"GlobalUniqueId" json:"globalUniqueId"`
+	GamePackageName           string                    `bson:"GamePackageName" json:"gamePackageName"`
+	Env                       string                    `bson:"Env" json:"env"`
+	JoinedEventRepetitionUuId JoinedEventRepetitionUuId `bson:"JoinedEventRepetitionUuId" json:"JoinedEventRepetitionUuId"`
+	UserEventData             UserEventData             `bson:"UserEventData" json:"userEventData"`
 }
 
 type User_Event_Handler interface {
