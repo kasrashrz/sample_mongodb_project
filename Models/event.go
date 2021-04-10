@@ -133,14 +133,14 @@ func (event Event) UpdateOneEvent(ctx *gin.Context) {
 }
 
 func (event Event) Terminate(ctx *gin.Context) {
-	RandomId := ctx.Param("randomId")
-	if RandomId == "" {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
 		ctx.Abort()
 		return
 	}
 
-	_, err := event.TerminateAPI("Events", RandomId)
+	_, err := event.TerminateAPI("Events", id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
@@ -148,7 +148,7 @@ func (event Event) Terminate(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Event successfully updated ", "event": RandomId})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Event successfully updated ", "event": id})
 	ctx.Abort()
 	return
 }

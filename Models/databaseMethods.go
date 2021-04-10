@@ -305,13 +305,16 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, EventId strin
 	return res, nil
 }
 
-func (events Event) TerminateAPI(colName string, RandomId string) (*mongo.UpdateResult, *Errors.RestError) {
+func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
+	Time_Now := dates.EpchoConvertor()
+	fmt.Println(Time_Now)
 	filter := bson.M{
-		"Repetition.RandomRepetitionUuid": RandomId,
+		"_id" : id,
+		"Repetition.EndTime": bson.M{ "$lt": Time_Now },
 	}
 	update := bson.M{
 		"$set": bson.M{
@@ -321,7 +324,7 @@ func (events Event) TerminateAPI(colName string, RandomId string) (*mongo.Update
 	res, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To update")
-		log.Printf("Faild to update id %v %v", RandomId, err)
+		log.Printf("Faild to update id %v %v", id, err)
 		return nil, ServerError
 	}
 	return res, nil
