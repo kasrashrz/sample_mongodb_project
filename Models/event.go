@@ -11,14 +11,7 @@ import (
 
 var client *mongo.Client
 
-type EventEndTimeType uint
-
 var userModel = new(Event)
-
-const (
-	absolute EventEndTimeType = iota
-	relative
-)
 
 type Event struct {
 	ID                             primitive.ObjectID     `bson:"_id" json:"id"`
@@ -27,7 +20,7 @@ type Event struct {
 	EventEndType                   string                 `bson:"EventEndType" json:"eventEndType"`
 	ClientType                     string                 `bson:"ClientType" json:"clientType"`
 	PeriodTimeForMiddleJoinTillEnd int64                  `bson:"PeriodTimeForMiddleJoinTillEnd" json:"periodTimeForMiddleJoinTillEnd"`
-	ConfigVersion                  float64                    `bson:"ConfigVersion" json:"configVersion"`
+	ConfigVersion                  float64                `bson:"ConfigVersion" json:"configVersion"`
 	States                         map[string]interface{} `bson:"States" json:"states"`
 	VersionMetaData                map[string]interface{} `bson:"VersionMetaData" json:"versionMetaData"`
 	Repetition                     []Repetition           `bson:"Repetition" json:"repetition"`

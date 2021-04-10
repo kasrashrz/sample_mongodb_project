@@ -282,6 +282,11 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 			"Name": event.Name,
 			"Env":  event.Env,
 			"EventEndType": event.EventEndType,
+			"ClientType": event.ClientType,
+			"PeriodTimeForMiddleJoinTillEnd": event.PeriodTimeForMiddleJoinTillEnd,
+			"ConfigVersion": event.ConfigVersion,
+			"States": event.States,
+			"VersionMetadata": event.VersionMetaData,
 			"Repetition":ins.Repetition,
 		},
 	}
