@@ -164,10 +164,11 @@ func (event Event) AddEvent(colName string) (*mongo.InsertOneResult, *Errors.Res
 	defer cancel()
 	collection := db.GetCollection(colName)
 	ins := Event{
-		ID:           primitive.NewObjectID(),
-		Name:         event.Name,
-		Env:          event.Env,
-		EventEndTime: event.EventEndTime,
+		ID:               primitive.NewObjectID(),
+		Name:             event.Name,
+		Env:              event.Env,
+		EventEndType: 	  event.EventEndType,
+		States:           event.States,
 	}
 	for _, repetitions := range event.Repetition {
 		repetitions.RandomRepetitionUuId = Utils.RandomId()

@@ -21,13 +21,16 @@ const (
 )
 
 type Event struct {
-	ID               primitive.ObjectID     `bson:"_id" json:"id"`
-	Name             string                 `bson:"Name" json:"name"`
-	Env              string                 `bson:"Env" json:"env"`
-	EventEndTimeType string                 `bson:"EventEndTimeType" json:"EventEndTimeType"`
-	States           map[string]interface{} `bson:"States" json:"states"`
-	EventEndTime     string                 `bson:"EventEndTime" json:"eventEndTime"`
-	Repetition       []Repetition           `bson:"Repetition" json:"repetition"`
+	ID                             primitive.ObjectID     `bson:"_id" json:"id"`
+	Name                           string                 `bson:"Name" json:"name"`
+	Env                            string                 `bson:"Env" json:"env"`
+	EventEndType                   string                 `bson:"EventEndType" json:"eventEndType"`
+	ClientType                     string                 `bson:"ClientType" json:"clientType"`
+	PeriodTimeForMiddleJoinTillEnd int64                  `bson:"PeriodTimeForMiddleJoinTillEnd" json:"periodTimeForMiddleJoinTillEnd"`
+	ConfigVersion                  int                    `bson:"ConfigVersion" json:"configVersion"`
+	States                         map[string]interface{} `bson:"States" json:"states"`
+	VersionMetaData                map[string]interface{} `bson:"VersionMetaData" json:"versionMetaData"`
+	Repetition                     []Repetition           `bson:"Repetition" json:"repetition"`
 }
 
 type Event_Handler interface {
