@@ -14,7 +14,7 @@ type UserEvent struct {
 	GamePackageName           string                    `bson:"GamePackageName" json:"gamePackageName"`
 	Env                       string                    `bson:"Env" json:"env"`
 	JoinedEventRepetitionUuId JoinedEventRepetitionUuId `bson:"JoinedEventRepetitionUuId" json:"JoinedEventRepetitionUuId"`
-	UserEventData             UserEventData             `bson:"UserEventData" json:"userEventData"`
+	UserEventData             []UserEventData             `bson:"UserEventData" json:"userEventData"`
 }
 
 type User_Event_Handler interface {

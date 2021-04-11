@@ -194,40 +194,18 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
-	EventCollection := db.GetCollection("Events")
-	var result Event
-	EventId, _ := primitive.ObjectIDFromHex(UE.UserEventData.EventId)
-	filter := bson.M{
-		"_id": EventId,
-		"Repetition.StartTime": UE.UserEventData.StartTime,
-	}
-	err := EventCollection.FindOne(context.TODO(), filter).Decode(&result)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("*+*+*++*+*+*+*+*+*+*+", result.Repetition)
 	ins := UserEvent{
-	ID:              primitive.NewObjectID(),
+		ID:              primitive.NewObjectID(),
 		UUID:            UE.UUID,
 		GlobalUniqueId:  UE.GlobalUniqueId,
 		GamePackageName: UE.GamePackageName,
 		Env:             UE.Env,
 		JoinedEventRepetitionUuId: UE.JoinedEventRepetitionUuId,
-		UserEventData: UserEventData{
-			EventId:        UE.UserEventData.EventId,
-			UserEventStage: UE.UserEventData.UserEventStage,
-			Score:          UE.UserEventData.Score,
-			JoinTime:       UE.UserEventData.JoinTime,
-			EndTime:        UE.UserEventData.EndTime,
-			StartTime:      UE.UserEventData.StartTime,
-			PreActiveTime:  UE.UserEventData.PreActiveTime,
-		},
 	}
-	//for _, repetitionData := range result.Repetition {
-	//	repetitionData.RandomRepetitionUuId = Utils.RandomId()
-	//	repetitionData.StartTime = dates.EpchoConvertor()
-	//	ins.UserEventData = append(ins.UserEventData, repetitionData)
-	//}
+	for _, UserEventData := range UE.UserEventData {
+		//repetitionData.StartTime = dates.EpchoConvertor()
+		ins.UserEventData = append(ins.UserEventData, UserEventData)
+	}
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed to insert")
@@ -317,6 +295,11 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, UserEventId s
 		log.Printf("Faild to update id %v %v", UE.ID, err)
 		return nil, ServerError
 	}
+	ins := UserEvent{}
+	for _, UserEventData := range ins.UserEventData {
+		UserEventData.StartTime = dates.EpchoConvertor()
+		ins.UserEventData = append(ins.UserEventData, UserEventData)
+	}
 	update := bson.D{
 		{"$set", bson.D{
 			{"UUID", UE.UUID},
@@ -324,14 +307,9 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, UserEventId s
 			{"GamePackageName", UE.GamePackageName},
 			{"Env", UE.Env},
 			{"JoinedEventRepetitionUuId", UE.JoinedEventRepetitionUuId},
-			{"UserEventData.EventId", UE.UserEventData.EventId},
-			{"UserEventData.UserEventStage", UE.UserEventData.UserEventStage},
-			{"UserEventData.Score", UE.UserEventData.Score},
-			{"UserEventData.JoinTime", UE.UserEventData.JoinTime},
-			{"UserEventData.EndTime", UE.UserEventData.EndTime},
-			{"UserEventData.StartTime", UE.UserEventData.StartTime},
-			{"UserEventData.PreActiveTime", UE.UserEventData.PreActiveTime},
+			{"UserEventData" , ins.UserEventData},
 		}},
+
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
