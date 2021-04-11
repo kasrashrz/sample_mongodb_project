@@ -196,17 +196,18 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 	collection := db.GetCollection(colName)
 	EventCollection := db.GetCollection("Events")
 	var result Event
-	EventId,_ := primitive.ObjectIDFromHex(UE.UserEventData.EventId)
+	EventId, _ := primitive.ObjectIDFromHex(UE.UserEventData.EventId)
 	filter := bson.M{
 		"_id": EventId,
-		}
+		"Repetition.StartTime": UE.UserEventData.StartTime,
+	}
 	err := EventCollection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	fmt.Println("*+*+*++*+*+*+*+*+*+*+", result.Repetition)
 	ins := UserEvent{
-		ID:              primitive.NewObjectID(),
+	ID:              primitive.NewObjectID(),
 		UUID:            UE.UUID,
 		GlobalUniqueId:  UE.GlobalUniqueId,
 		GamePackageName: UE.GamePackageName,
@@ -221,6 +222,11 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 			StartTime:      UE.UserEventData.StartTime,
 			PreActiveTime:  UE.UserEventData.PreActiveTime,
 		},
+	}
+	for _, repetitionData := range result.Repetition {
+		repetitionData.RandomRepetitionUuId = Utils.RandomId()
+		repetitionData.StartTime = dates.EpchoConvertor()
+		ins.UserEventData = append(ins.UserEventData, repetitionData)
 	}
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
@@ -286,7 +292,7 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 			"PeriodTimeForMiddleJoinTillEnd": event.PeriodTimeForMiddleJoinTillEnd,
 			"ConfigVersion": event.ConfigVersion,
 			"States": event.States,
-			"VersionMetadata": event.VersionMetaData,
+			"VersionMetaData": event.VersionMetaData,
 			"Repetition":ins.Repetition,
 		},
 	}
@@ -299,12 +305,12 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 	return res, nil
 }
 
-func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, EventId string) (*mongo.UpdateResult, *Errors.RestError) {
+func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, UserEventId string) (*mongo.UpdateResult, *Errors.RestError) {
 	db.Init()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
-	id, err := primitive.ObjectIDFromHex(EventId)
+	id, err := primitive.ObjectIDFromHex(UserEventId)
 	filter := bson.M{"_id": id}
 	if err != nil {
 		ServerError := Errors.ServerError("failed to update")

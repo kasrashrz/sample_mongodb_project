@@ -9,7 +9,7 @@ import (
 
 type UserEvent struct {
 	ID                        primitive.ObjectID        `bson:"_id" json:"id"`
-	UUID                      string                    `bson:"UUID" json:"uuid"`
+	UUID                      string                    `bson:"UuId" json:"uuid"`
 	GlobalUniqueId            string                    `bson:"GlobalUniqueId" json:"globalUniqueId"`
 	GamePackageName           string                    `bson:"GamePackageName" json:"gamePackageName"`
 	Env                       string                    `bson:"Env" json:"env"`
@@ -25,8 +25,8 @@ type User_Event_Handler interface {
 	UpdateOneUserEvents(ctx *gin.Context)
 }
 
-func (UE UserEvent) AddOneUserEvent(ctx *gin.Context) {
-	user, err := UE.CheckUserEvent(ctx, "")
+func (UserEvent UserEvent) AddOneUserEvent(ctx *gin.Context) {
+	user, err := UserEvent.CheckUserEvent(ctx, "")
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -45,7 +45,7 @@ func (UE UserEvent) AddOneUserEvent(ctx *gin.Context) {
 	return
 }
 
-func (UE UserEvent) GetAllUserEvents(ctx *gin.Context) {
+func (UserEvents UserEvent) GetAllUserEvents(ctx *gin.Context) {
 	UserEvent, err := userModel.FindAllUES("UserEvent")
 	if err != nil {
 		fmt.Println(err)
@@ -54,16 +54,16 @@ func (UE UserEvent) GetAllUserEvents(ctx *gin.Context) {
 	return
 }
 
-func (UE UserEvent) GetOneUserEvent(ctx *gin.Context) {
+func (UserEvents UserEvent) GetOneUserEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.GetUEByID("UserEvent", id)
+		UserEvent, err := userModel.GetUEByID("UserEvent", id)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "event": event})
+		ctx.JSON(http.StatusOK, gin.H{"message": "Event found!", "event": UserEvent})
 		return
 	}
 	ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -71,16 +71,16 @@ func (UE UserEvent) GetOneUserEvent(ctx *gin.Context) {
 	return
 }
 
-func (UE UserEvent) DeleteOneUserEvents(ctx *gin.Context) {
+func (UserEvents UserEvent) DeleteOneUserEvents(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id != "" {
-		event, err := userModel.DeleteById("UserEvent", id)
+		UserEvent, err := userModel.DeleteById("UserEvent", id)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{"message": "User Event has deleted successfully", "ID": event.ID})
+		ctx.JSON(http.StatusOK, gin.H{"message": "User Event has deleted successfully", "ID": UserEvent.ID})
 		return
 	}
 	ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -88,7 +88,7 @@ func (UE UserEvent) DeleteOneUserEvents(ctx *gin.Context) {
 	return
 }
 
-func (UE UserEvent) UpdateOneUserEvent(ctx *gin.Context) {
+func (UserEvent UserEvent) UpdateOneUserEvent(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
@@ -96,14 +96,14 @@ func (UE UserEvent) UpdateOneUserEvent(ctx *gin.Context) {
 		return
 	}
 
-	SpecEvent, err := UE.CheckUserEvent(ctx, ctx.Param("id"))
+	SpecUserEvent, err := UserEvent.CheckUserEvent(ctx, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
 		ctx.Abort()
 		return
 	}
 
-	_, err = UE.UpdateUserEvent(SpecEvent, "UserEvent", id)
+	_, err = UserEvent.UpdateUserEvent(SpecUserEvent, "UserEvent", id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
@@ -111,6 +111,6 @@ func (UE UserEvent) UpdateOneUserEvent(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "User successfully updated ", "user": SpecEvent.ID.Hex()})
+	ctx.JSON(http.StatusOK, gin.H{"message": "User successfully updated ", "user": SpecUserEvent.ID.Hex()})
 	return
 }
