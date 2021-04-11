@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"kasra_medrick.com/mongo/Configs"
+	"kasra_medrick.com/mongo/Configs/db"
 )
 
 var (
@@ -11,6 +11,6 @@ var (
 
 func StartApp() {
 	mapURLs()
-	port := Configs.DotEnv("PORT")
+	port := db.DotEnv("PORT")
 	router.Run(":" + port)
 }

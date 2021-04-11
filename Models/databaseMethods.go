@@ -223,11 +223,11 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 			PreActiveTime:  UE.UserEventData.PreActiveTime,
 		},
 	}
-	for _, repetitionData := range result.Repetition {
-		repetitionData.RandomRepetitionUuId = Utils.RandomId()
-		repetitionData.StartTime = dates.EpchoConvertor()
-		ins.UserEventData = append(ins.UserEventData, repetitionData)
-	}
+	//for _, repetitionData := range result.Repetition {
+	//	repetitionData.RandomRepetitionUuId = Utils.RandomId()
+	//	repetitionData.StartTime = dates.EpchoConvertor()
+	//	ins.UserEventData = append(ins.UserEventData, repetitionData)
+	//}
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed to insert")
