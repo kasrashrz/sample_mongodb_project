@@ -295,14 +295,19 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, UserEventId s
 		log.Printf("Faild to update id %v %v", UE.ID, err)
 		return nil, ServerError
 	}
-	ins := UserEvent{}
-	for _, UserEventData := range ins.UserEventData {
-		UserEventData.StartTime = dates.EpchoConvertor()
+	ins := UserEvent{
+		UUID:                      UE.UUID,
+		GlobalUniqueId:            UE.GlobalUniqueId,
+		GamePackageName:           UE.GamePackageName,
+		Env:                       UE.Env,
+		JoinedEventRepetitionUuId: UE.JoinedEventRepetitionUuId,
+	}
+	for _, UserEventData := range UE.UserEventData {
 		ins.UserEventData = append(ins.UserEventData, UserEventData)
 	}
 	update := bson.D{
 		{"$set", bson.D{
-			{"UUID", UE.UUID},
+			{"UuId", UE.UUID},
 			{"GlobalUniqueId", UE.GlobalUniqueId},
 			{"GamePackageName", UE.GamePackageName},
 			{"Env", UE.Env},
