@@ -18,11 +18,11 @@ func mapURLs() {
 	router.POST("/event/delete/:id", Controllers.DeleteOneEventController)
 	router.POST("/event/update/:id", Controllers.UpdateById)
 	router.POST("/event/terminate/:id", Controllers.TerminateEventController)
+	router.GET("/user_events/history/:UserEventDataId", Controllers.GetHistoryController)
 	/* USER EVENT */
 	router.GET("/user_events/all", Controllers.GetAllUESController)
 	router.GET("/user_event/:id", Controllers.FindOneUEController)
 	router.POST("/user_event/add", Controllers.CreateUEController)
 	router.POST("/user_event/delete/:id", Controllers.DeleteOneUEController)
 	router.POST("/user_event/update/:id", Controllers.UpdateOneUEController)
-
 }

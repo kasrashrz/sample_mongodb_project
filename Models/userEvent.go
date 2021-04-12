@@ -13,7 +13,7 @@ type UserEvent struct {
 	GlobalUniqueId            string                    `bson:"GlobalUniqueId" json:"globalUniqueId"`
 	GamePackageName           string                    `bson:"GamePackageName" json:"gamePackageName"`
 	Env                       string                    `bson:"Env" json:"env"`
-	JoinedEventRepetitionUuId JoinedEventRepetitionUuId `bson:"JoinedEventRepetitionUuId" json:"JoinedEventRepetitionUuId"`
+	JoinedEventRepetitionUuId []JoinedEventRepetitionUuId `bson:"JoinedEventRepetitionUuId" json:"JoinedEventRepetitionUuId"`
 	UserEventData             []UserEventData             `bson:"UserEventData" json:"userEventData"`
 }
 
@@ -112,5 +112,22 @@ func (UserEvent UserEvent) UpdateOneUserEvent(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "User successfully updated ", "user": SpecUserEvent.ID.Hex()})
+	return
+}
+
+func (UserEvent UserEvent) GetHistoryAPI(ctx *gin.Context) {
+	id := ctx.Param("UserEventDataId")
+	if id != "" {
+		result, err := UserEvent.GetHistory("UserEvent", id)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			ctx.Abort()
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Get History API","result": result.UserEventData})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Bad Request"})
+	ctx.Abort()
 	return
 }

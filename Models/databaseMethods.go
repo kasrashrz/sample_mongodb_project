@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	_ "go.mongodb.org/mongo-driver/mongo/options"
 	"kasra_medrick.com/mongo/Configs/db"
 	"kasra_medrick.com/mongo/Utils"
 	"kasra_medrick.com/mongo/Utils/Errors"
@@ -203,7 +204,6 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 		JoinedEventRepetitionUuId: UE.JoinedEventRepetitionUuId,
 	}
 	for _, UserEventData := range UE.UserEventData {
-		//repetitionData.StartTime = dates.EpchoConvertor()
 		ins.UserEventData = append(ins.UserEventData, UserEventData)
 	}
 	res, err := collection.InsertOne(ctx, ins)
@@ -352,4 +352,32 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 		return nil, ServerError
 	}
 	return res, nil
+}
+
+func (UserEvents UserEvent) GetHistory(colName string, id string) (*UserEvent, *Errors.RestError) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	NewId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		ServerError := Errors.ServerError("Failed to create")
+		log.Printf("Failed to create object id from hex %v", id)
+		return nil, ServerError
+	}
+	filter := bson.M{
+		"UserEventData.eventId": NewId,
+	}
+	//findOps := options.Find()
+	//findOps.SetProjection(bson.M{
+	//	"UserEventData.$":1,
+	//})
+	var results UserEvent
+	err = collection.FindOne(ctx, filter).Decode(&results)
+	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
+		log.Printf("Unable find event by id %f", err)
+		return nil, BadReqError
+	}
+	return &results, nil
 }

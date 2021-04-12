@@ -26,3 +26,7 @@ func FindOneUEController(ctx *gin.Context) {
 func UpdateOneUEController(ctx *gin.Context) {
 	user_event.UpdateOneUserEvent(ctx)
 }
+
+func GetHistoryController(ctx *gin.Context){
+	user_event.GetHistoryAPI(ctx)
+}
