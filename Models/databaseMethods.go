@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	_ "go.mongodb.org/mongo-driver/mongo/options"
 	"kasra_medrick.com/mongo/Configs/db"
 	"kasra_medrick.com/mongo/Utils"
@@ -360,18 +361,19 @@ func (UserEvents UserEvent) GetHistory(colName string, id string) (*UserEvent, *
 	defer cancel()
 	collection := db.GetCollection(colName)
 	NewId, err := primitive.ObjectIDFromHex(id)
+	fmt.Println(NewId)
 	if err != nil {
 		ServerError := Errors.ServerError("Failed to create")
 		log.Printf("Failed to create object id from hex %v", id)
 		return nil, ServerError
 	}
 	filter := bson.M{
-		"UserEventData.eventId": NewId,
+		"UserEventData.EventId": id,
 	}
-	//findOps := options.Find()
-	//findOps.SetProjection(bson.M{
-	//	"UserEventData.$":1,
-	//})
+	findOps := options.Find()
+	findOps.SetProjection(bson.M{
+		"UserEventData.$":1,
+	})
 	var results UserEvent
 	err = collection.FindOne(ctx, filter).Decode(&results)
 	if err != nil {
@@ -381,3 +383,4 @@ func (UserEvents UserEvent) GetHistory(colName string, id string) (*UserEvent, *
 	}
 	return &results, nil
 }
+
