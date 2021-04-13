@@ -124,8 +124,12 @@ func (UserEvent UserEvent) GetHistoryAPI(ctx *gin.Context) {
 			ctx.Abort()
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{"message": "Get History API", "History": result.UserEventData})
-		return
+		for _,obj := range result.UserEventData{
+			if  obj.EventId == "6071fbe65ef79d58469a52e3" {
+				ctx.JSON(http.StatusOK, gin.H{"message": "Get History API", "History": obj})
+				return
+			}
+		}
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Bad Request"})
 	ctx.Abort()
