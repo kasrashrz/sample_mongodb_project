@@ -337,8 +337,6 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 	filter := bson.M{
 		"_id" : NewId,
 		"Repetition.EndTime": bson.M{"$lt":Time_Now},
-		"Repetition.Terminate": false,
-
 	}
 	update := bson.M{
 		"$set": bson.M{
@@ -346,7 +344,6 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 		},
 	}
 	res, err := collection.UpdateMany(ctx, filter, update)
-
 	if err != nil {
 		ServerError := Errors.ServerError("Failed To update")
 		log.Printf("Faild to update id %v %v", id, err)
