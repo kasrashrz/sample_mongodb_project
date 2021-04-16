@@ -196,6 +196,8 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
+	var result Event
+	EventCollection := db.GetCollection("Events")
 	ins := UserEvent{
 		ID:              primitive.NewObjectID(),
 		UUID:            UE.UUID,
@@ -205,7 +207,25 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 		JoinedEventRepetitionUuId: UE.JoinedEventRepetitionUuId,
 	}
 	for _, UserEventData := range UE.UserEventData {
-		ins.UserEventData = append(ins.UserEventData, UserEventData)
+		id, _ := primitive.ObjectIDFromHex(UserEventData.EventId)
+		filter := bson.M{
+			"_id": id,
+			"Repetition": bson.M{
+				"$elemMatch": bson.M{
+					"Terminate": true,
+				},
+			},
+		}
+		_ = EventCollection.FindOne(ctx, filter).Decode(&result)
+		for _, obj := range result.Repetition{
+			if  obj.Terminate != true && obj.EndTime == UserEventData.EndTime{
+				fmt.Println("+-+-",obj)
+				UserEventData.EndTime = obj.EndTime
+				UserEventData.StartTime = obj.StartTime
+				UserEventData.PreActiveTime = obj.StartPreActiveTime
+				ins.UserEventData = append(ins.UserEventData, UserEventData)
+			}
+		}
 	}
 	res, err := collection.InsertOne(ctx, ins)
 	if err != nil {
