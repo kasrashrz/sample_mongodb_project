@@ -331,23 +331,42 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection := db.GetCollection(colName)
+	UserEventCollection := db.GetCollection("UserEvent")
 	Time_Now := dates.EpchoConvertor()
 	NewId, _ := primitive.ObjectIDFromHex(id)
 	fmt.Println(Time_Now)
-	filter := bson.M{
+	EventFilter := bson.M{
 		"_id" : NewId,
 		"Repetition": bson.M{"$elemMatch":bson.M{
 			"EndTime": bson.M{"$gt": Time_Now},
 			"Terminate": false,
 		}},
 	}
-	update := bson.M{
+	EventUpdate := bson.M{
 		"$set": bson.M{
 			"Repetition.$.Terminate" : true,
 		},
 	}
-	res, err := collection.UpdateOne(ctx, filter, update)
+	UserEventFilter := bson.M{
+		"UserEventData": bson.M{"$elemMatch":bson.M{
+			"EventId": id,
+			"EndTime": bson.M{"$gt": Time_Now},
+			"UserEventStage": bson.M{"$ne": "terminated"},
+		}},
+	}
+	UserEventUpdate := bson.M{
+		"$set": bson.M{
+			"UserEventData.$.UserEventStage" : "terminated",
+		},
+	}
+	res, err := UserEventCollection.UpdateOne(ctx, UserEventFilter, UserEventUpdate)
 	if err != nil {
+		ServerError := Errors.ServerError("Failed To update")
+		log.Printf("Faild to update id %v %v", id, err)
+		return nil, ServerError
+	}
+	_ , UserEventErr := collection.UpdateOne(ctx, EventFilter, EventUpdate)
+	if UserEventErr != nil {
 		ServerError := Errors.ServerError("Failed To update")
 		log.Printf("Faild to update id %v %v", id, err)
 		return nil, ServerError
