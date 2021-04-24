@@ -1,19 +1,11 @@
 version: "2"
 services:
   mong_golang:
-    image: golang:1.6.1
-    build:
-      context: . # Use an image built from the specified dockerfile in the current directory.
-      dockerfile: Dockerfile
-    depends_on:
-        - 'mongo'
-    restart: unless-stopped
+    image: test
+    restart: always
     environment:
         - PORT=8000
+        - DB_NAME= golang
+        - DB_HOST=127.0.0.1
     ports:
-        - '8080:8080'
-    # MongoDB
-  mongo:
-    image: 'mongo:4.2.6-bionic'
-    ports:
-        - '27017:27017'
+        - '8000:8000'
