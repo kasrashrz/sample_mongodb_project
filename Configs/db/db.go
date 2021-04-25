@@ -17,8 +17,7 @@ var instance *mongo.Client
 //*** DOT ENV ***//
 func ViperConfigVariable(key string) string {
 	viper.SetConfigName("setup")
-	viper.AddConfigPath("./Configs/db/")
-	///home/kasra/mong_golang/Configs/db
+	viper.AddConfigPath("./Configs")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("Error while reading config file %s", err)
@@ -37,9 +36,10 @@ func Init() *mongo.Client {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+ViperConfigVariable("DB_HOST")+":27017"))
-		//mongodb://0.0.0.0:27017
-		// 192.168.1.50
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+
+		//fmt.Println("mongodb://"+ViperConfigVariable("DB_HOST")+":27017")
+
 		if err != nil {
 			log.Fatalf("Failed to connect to mongo db %f", err)
 		}
