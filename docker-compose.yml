@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   mong_golang:
-    image: newone
+    image: ishala
     restart: always
     environment:
         - PORT=8080
