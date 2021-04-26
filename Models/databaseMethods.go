@@ -359,6 +359,7 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 		"_id" : NewId,
 		"Repetition": bson.M{"$elemMatch":bson.M{
 			"EndTime": bson.M{"$gt": Time_Now},
+			"StartTime": bson.M{"$lt": Time_Now},
 			"Terminate": false,
 		}},
 	}
