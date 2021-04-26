@@ -1,11 +1,13 @@
-version: "3.5"
+version: "3"
 services:
   mong_golang:
     image: ishala
     restart: always
     environment:
-        - "PORT=3000"
-        - "DB_NAME=golang"
-        - "DB_HOST=127.0.0.1"
+      -  PORT= 1111
+      - "DB_NAME=golangkasrashirazi"
+      - "DB_HOST=45.94.255.122"
+      - "DB_USER=admin"
+      - "DB_PASS=fb17ca2ad9b18dbcd8125d1e9d9bbba9sdadsasd"
     ports:
         - '3000:3000'
