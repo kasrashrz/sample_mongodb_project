@@ -26,4 +26,5 @@ func mapURLs() {
 	router.POST("/user_event/add", Controllers.CreateUEController)
 	router.POST("/user_event/delete/:id", Controllers.DeleteOneUEController)
 	router.POST("/user_event/update/:id", Controllers.UpdateOneUEController)
+	router.POST("/event/ChangeState/:id", Controllers.ChangeStateController)
 }
