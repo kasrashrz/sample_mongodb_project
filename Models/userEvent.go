@@ -8,11 +8,11 @@ import (
 )
 
 type UserEvent struct {
-	ID                        primitive.ObjectID        `bson:"_id" json:"id"`
-	UUID                      string                    `bson:"UuId" json:"uuid"`
-	GlobalUniqueId            string                    `bson:"GlobalUniqueId" json:"globalUniqueId"`
-	GamePackageName           string                    `bson:"GamePackageName" json:"gamePackageName"`
-	Env                       string                    `bson:"Env" json:"env"`
+	ID                        primitive.ObjectID          `bson:"_id" json:"id"`
+	UUID                      string                      `bson:"UuId" json:"uuid"`
+	GlobalUniqueId            string                      `bson:"GlobalUniqueId" json:"globalUniqueId"`
+	GamePackageName           string                      `bson:"GamePackageName" json:"gamePackageName"`
+	Env                       string                      `bson:"Env" json:"env"`
 	JoinedEventRepetitionUuId []JoinedEventRepetitionUuId `bson:"JoinedEventRepetitionUuId" json:"JoinedEventRepetitionUuId"`
 	UserEventData             []UserEventData             `bson:"UserEventData" json:"userEventData"`
 }
@@ -124,8 +124,8 @@ func (UserEvent UserEvent) GetHistoryAPI(ctx *gin.Context) {
 			ctx.Abort()
 			return
 		}
-			ctx.JSON(http.StatusOK, gin.H{"message": "Get History API", "History": result.UserEventData})
-		 	return
+		ctx.JSON(http.StatusOK, gin.H{"message": "Get History API", "History": result.UserEventData})
+		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Bad Request"})
 	ctx.Abort()

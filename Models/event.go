@@ -159,7 +159,7 @@ func (event Event) GetActive(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "", "Active Event" : output})
+	ctx.JSON(http.StatusOK, gin.H{"message": "", "Active Event": output})
 	ctx.Abort()
 	return
 }

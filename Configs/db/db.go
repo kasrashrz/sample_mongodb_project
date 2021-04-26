@@ -37,7 +37,8 @@ func Init() *mongo.Client {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://" + ViperConfigVariable("DB_HOST") + ":27017"))
+		// client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://" + ViperConfigVariable("DB_HOST") + ":27017"))
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+ ViperConfigVariable("DB_USER") +":"+ ViperConfigVariable("DB_PASS") + "@"+ ViperConfigVariable("DB_HOST") + ":27017/"))
 
 		//fmt.Println("mongodb://"+ViperConfigVariable("DB_HOST")+":27017")
 

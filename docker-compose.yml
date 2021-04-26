@@ -8,4 +8,4 @@ services:
         - DB_NAME="golang"
         - DB_HOST="127.0.0.1"
     ports:
-        - '8080:8080'
+        - '3000:3000'
