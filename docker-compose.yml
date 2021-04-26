@@ -4,8 +4,8 @@ services:
     image: ishala
     restart: always
     environment:
-        - PORT=8080
-        - DB_NAME="golang"
-        - DB_HOST="127.0.0.1"
+        - "PORT=3000"
+        - "DB_NAME=golang"
+        - "DB_HOST=127.0.0.1"
     ports:
         - '3000:3000'
