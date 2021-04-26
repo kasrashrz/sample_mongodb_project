@@ -424,3 +424,34 @@ func (UserEvents UserEvent) GetHistory(colName string, id string) (*UserEvent, *
 	return &results, nil
 }
 
+func (event *Event) GetActiveAPI(colName string) ([]*Event, *Errors.RestError) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	Time_Now := dates.EpchoConvertor()
+	filter := bson.M{
+		"Repetition": bson.M{"$elemMatch":bson.M{
+			"EndTime": bson.M{"$gt": Time_Now},
+			"StartTime": bson.M{"$lt": Time_Now},
+			"Terminate": false,
+		}},
+	}
+	var results []*Event
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
+		log.Printf("Unable find event by id", err)
+		return results, BadReqError
+	}
+	for cur.Next(ctx) {
+		var t Event
+		err := cur.Decode(&t)
+		if err != nil {
+			BadReqError := Errors.BadRequest("Invalid ID")
+			return results, BadReqError
+		}
+		results = append(results, &t)
+	}
+	return results, nil
+}
