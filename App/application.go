@@ -2,10 +2,9 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"kasra_medrick.com/mongo/Configs/db"
 	_ "kasra_medrick.com/mongo/Configs/db"
-
-	)
+	"os"
+)
 
 var (
 	router = gin.Default()
@@ -13,6 +12,6 @@ var (
 
 func StartApp() {
 	mapURLs()
-	port := db.ViperConfigVariable("PORT")
+	port := os.Getenv("PORT")
 	router.Run(":" + port)
 }
