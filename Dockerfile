@@ -12,6 +12,6 @@ WORKDIR /app
 
 RUN go build -o main main.go
 
-EXPOSE 8080
+EXPOSE 3000
 
-CMD ["./main"]
+ENTRYPOINT [ "./main" ]

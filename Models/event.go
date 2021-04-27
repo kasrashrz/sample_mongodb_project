@@ -148,3 +148,18 @@ func (event Event) Terminate(ctx *gin.Context) {
 	ctx.Abort()
 	return
 }
+
+func (event Event) GetActive(ctx *gin.Context) {
+
+	output, err := event.GetActiveAPI("Events")
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Bad Request"})
+		ctx.Abort()
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "", "Active Event": output})
+	ctx.Abort()
+	return
+}
