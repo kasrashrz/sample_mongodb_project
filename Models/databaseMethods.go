@@ -199,11 +199,11 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 	var result Event
 	EventCollection := db.GetCollection("Events")
 	ins := UserEvent{
-		ID:              primitive.NewObjectID(),
-		UUID:            UE.UUID,
-		GlobalUniqueId:  UE.GlobalUniqueId,
-		GamePackageName: UE.GamePackageName,
-		Env:             UE.Env,
+		ID:                        primitive.NewObjectID(),
+		UUID:                      UE.UUID,
+		GlobalUniqueId:            UE.GlobalUniqueId,
+		GamePackageName:           UE.GamePackageName,
+		Env:                       UE.Env,
 		JoinedEventRepetitionUuId: UE.JoinedEventRepetitionUuId,
 	}
 	for _, UserEventData := range UE.UserEventData {
@@ -217,9 +217,9 @@ func (UE UserEvent) AddUserEvent(colName string) (*mongo.InsertOneResult, *Error
 			},
 		}
 		_ = EventCollection.FindOne(ctx, filter).Decode(&result)
-		for _, obj := range result.Repetition{
-			if  obj.Terminate != true && obj.EndTime == UserEventData.EndTime{
-				fmt.Println("+-+-",obj)
+		for _, obj := range result.Repetition {
+			if obj.Terminate != true && obj.EndTime == UserEventData.EndTime {
+				fmt.Println("+-+-", obj)
 				UserEventData.EndTime = obj.EndTime
 				UserEventData.StartTime = obj.StartTime
 				UserEventData.PreActiveTime = obj.StartPreActiveTime
@@ -284,15 +284,15 @@ func (events Event) Update(event Event, colName string, EventId string) (*mongo.
 	// TODO: FULL UPDATE
 	update := bson.M{
 		"$set": bson.M{
-			"Name": event.Name,
-			"Env":  event.Env,
-			"EventEndType": event.EventEndType,
-			"ClientType": event.ClientType,
+			"Name":                           event.Name,
+			"Env":                            event.Env,
+			"EventEndType":                   event.EventEndType,
+			"ClientType":                     event.ClientType,
 			"PeriodTimeForMiddleJoinTillEnd": event.PeriodTimeForMiddleJoinTillEnd,
-			"ConfigVersion": event.ConfigVersion,
-			"States": event.States,
-			"VersionMetaData": event.VersionMetaData,
-			"Repetition":ins.Repetition,
+			"ConfigVersion":                  event.ConfigVersion,
+			"States":                         event.States,
+			"VersionMetaData":                event.VersionMetaData,
+			"Repetition":                     ins.Repetition,
 		},
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)
@@ -333,9 +333,8 @@ func (UES UserEvent) UpdateUserEvent(UE UserEvent, colName string, UserEventId s
 			{"GamePackageName", UE.GamePackageName},
 			{"Env", UE.Env},
 			{"JoinedEventRepetitionUuId", UE.JoinedEventRepetitionUuId},
-			{"UserEventData" , ins.UserEventData},
+			{"UserEventData", ins.UserEventData},
 		}},
-
 	}
 	res, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -356,27 +355,28 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 	NewId, _ := primitive.ObjectIDFromHex(id)
 	fmt.Println(Time_Now)
 	EventFilter := bson.M{
-		"_id" : NewId,
-		"Repetition": bson.M{"$elemMatch":bson.M{
-			"EndTime": bson.M{"$gt": Time_Now},
+		"_id": NewId,
+		"Repetition": bson.M{"$elemMatch": bson.M{
+			"EndTime":   bson.M{"$gt": Time_Now},
+			"StartTime": bson.M{"$lt": Time_Now},
 			"Terminate": false,
 		}},
 	}
 	EventUpdate := bson.M{
 		"$set": bson.M{
-			"Repetition.$.Terminate" : true,
+			"Repetition.$.Terminate": true,
 		},
 	}
 	UserEventFilter := bson.M{
-		"UserEventData": bson.M{"$elemMatch":bson.M{
-			"EventId": id,
-			"EndTime": bson.M{"$gt": Time_Now},
+		"UserEventData": bson.M{"$elemMatch": bson.M{
+			"EventId":        id,
+			"EndTime":        bson.M{"$gt": Time_Now},
 			"UserEventStage": bson.M{"$ne": "terminated"},
 		}},
 	}
 	UserEventUpdate := bson.M{
 		"$set": bson.M{
-			"UserEventData.$.UserEventStage" : "terminated",
+			"UserEventData.$.UserEventStage": "terminated",
 		},
 	}
 	res, err := UserEventCollection.UpdateOne(ctx, UserEventFilter, UserEventUpdate)
@@ -385,7 +385,7 @@ func (events Event) TerminateAPI(colName string, id string) (*mongo.UpdateResult
 		log.Printf("Faild to update id %v %v", id, err)
 		return nil, ServerError
 	}
-	_ , UserEventErr := collection.UpdateOne(ctx, EventFilter, EventUpdate)
+	_, UserEventErr := collection.UpdateOne(ctx, EventFilter, EventUpdate)
 	if UserEventErr != nil {
 		ServerError := Errors.ServerError("Failed To update")
 		log.Printf("Faild to update id %v %v", id, err)
@@ -411,7 +411,7 @@ func (UserEvents UserEvent) GetHistory(colName string, id string) (*UserEvent, *
 	}
 	findOps := options.Find()
 	findOps.SetProjection(bson.M{
-		"UserEventData.$":1,
+		"UserEventData.$": 1,
 	})
 	var results UserEvent
 	err = collection.FindOne(ctx, filter).Decode(&results)
@@ -423,3 +423,72 @@ func (UserEvents UserEvent) GetHistory(colName string, id string) (*UserEvent, *
 	return &results, nil
 }
 
+func (event *Event) GetActiveAPI(colName string) ([]*Event, *Errors.RestError) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	Time_Now := dates.EpchoConvertor()
+	filter := bson.M{
+		"Repetition": bson.M{"$elemMatch": bson.M{
+			"EndTime":   bson.M{"$gt": Time_Now},
+			"StartTime": bson.M{"$lt": Time_Now},
+			"Terminate": false,
+		}},
+	}
+	var results []*Event
+	cur, err := collection.Find(ctx, filter)
+	if err != nil {
+		BadReqError := Errors.BadRequest("Invalid ID")
+		log.Printf("Unable find event by id", err)
+		return results, BadReqError
+	}
+	for cur.Next(ctx) {
+		var t Event
+		err := cur.Decode(&t)
+		if err != nil {
+			BadReqError := Errors.BadRequest("Invalid ID")
+			return results, BadReqError
+		}
+		results = append(results, &t)
+	}
+	return results, nil
+}
+
+func (UES UserEvent) ChangeStateUserEvent(UE UserEvent, colName string, UserEventId string) (*mongo.UpdateResult, *Errors.RestError) {
+	db.Init()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection := db.GetCollection(colName)
+	//Time_Now := dates.EpchoConvertor()
+	filter := bson.M{
+		"UserEventData": bson.M{
+			"$elemMatch": bson.M{
+				"EventId": UserEventId,
+				//"EndTime": bson.M{"$gt": Time_Now},
+				//"StartTime": bson.M{"$lt": Time_Now},
+				//"Terminate": false,
+			}},
+	}
+	ins := UserEvent{
+		UUID:            UE.UUID,
+		GlobalUniqueId:  UE.GlobalUniqueId,
+		GamePackageName: UE.GamePackageName,
+		Env:             UE.Env,
+	}
+	for _, UserEventData := range UE.UserEventData {
+		ins.UserEventData = append(ins.UserEventData, UserEventData)
+	}
+	update := bson.D{
+		{"$set", bson.D{
+			{"UserEventData", ins.UserEventData},
+		}},
+	}
+	res, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		ServerError := Errors.ServerError("Failed To update")
+		log.Printf("Faild to update id %v %v", UE.ID, err)
+		return nil, ServerError
+	}
+	return res, nil
+}

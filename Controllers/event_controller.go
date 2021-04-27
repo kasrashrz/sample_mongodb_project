@@ -30,3 +30,6 @@ func UpdateById(ctx *gin.Context) {
 func TerminateEventController(ctx *gin.Context){
 	event.Terminate(ctx)
 }
+func GetActiveEventController(ctx *gin.Context){
+	event.GetActive(ctx)
+}
