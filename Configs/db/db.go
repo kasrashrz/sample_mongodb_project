@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 	"sync"
 	"time"
 )
@@ -28,7 +29,6 @@ func ViperConfigVariable(key string) string {
 	}
 	return value
 }
-
 //*** DATA BASE ***//
 func Init() *mongo.Client {
 
@@ -38,7 +38,7 @@ func Init() *mongo.Client {
 		defer cancel()
 
 		// client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://" + ViperConfigVariable("DB_HOST") + ":27017"))
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+ ViperConfigVariable("DB_USER") +":"+ ViperConfigVariable("DB_PASS") + "@"+ ViperConfigVariable("DB_HOST") + ":27017/"))
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+ os.Getenv("DB_USER") +":"+ os.Getenv("DB_PASS") + "@"+ os.Getenv("DB_HOST") + ":27017/"))
 
 		//fmt.Println("mongodb://"+ViperConfigVariable("DB_HOST")+":27017")
 
@@ -52,6 +52,6 @@ func Init() *mongo.Client {
 	return instance
 }
 func GetCollection(collection string) *mongo.Collection {
-	coll := instance.Database(ViperConfigVariable("DB_NAME")).Collection(collection)
+	coll := instance.Database(os.Getenv("DB_NAME")).Collection(collection)
 	return coll
 }
