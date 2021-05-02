@@ -6,10 +6,6 @@ COPY  . /app
 
 WORKDIR /app
 
-# COPY . .
-
-#RUN go mod download
-
 RUN go build -o main main.go
 
 EXPOSE 3000
