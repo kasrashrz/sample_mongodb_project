@@ -1,13 +1,13 @@
 version: '3'
 services:
   mong_golang:
-    image: 'final'
+    image: 'medrick/golang_mongo:1.0.0'
     ports:
       - '1111:1111'
     restart: always
     environment:
        PORT: 1111
        DB_NAME: golangkasrashirazi
-       DB_HOST: 45.94.255.122
+       DB_HOST: 0.0.0.0
        DB_USER: admin
-       DB_PASS: fb17ca2ad9b18dbcd8125d1e9d9bbba9sdadsasd
+       DB_PASS: 12345
