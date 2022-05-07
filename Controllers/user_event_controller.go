@@ -27,9 +27,9 @@ func UpdateOneUEController(ctx *gin.Context) {
 	user_event.UpdateOneUserEvent(ctx)
 }
 
-func GetHistoryController(ctx *gin.Context){
+func GetHistoryController(ctx *gin.Context) {
 	user_event.GetHistoryAPI(ctx)
 }
-func ChangeStateController(ctx *gin.Context){
+func ChangeStateController(ctx *gin.Context) {
 	user_event.ChangeStateAPI(ctx)
 }

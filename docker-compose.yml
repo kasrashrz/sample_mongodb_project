@@ -6,8 +6,8 @@ services:
       - '1111:1111'
     restart: always
     environment:
-       PORT: 1111
-       DB_NAME: golangkasrashirazi
-       DB_HOST: 0.0.0.0
-       DB_USER: admin
-       DB_PASS: 12345
+      PORT: 1111
+      DB_NAME: golangkasrashirazi
+      DB_HOST: 0.0.0.0
+      DB_USER: admin
+      DB_PASS: 12345

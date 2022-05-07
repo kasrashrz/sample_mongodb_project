@@ -29,6 +29,7 @@ func ViperConfigVariable(key string) string {
 	}
 	return value
 }
+
 //*** DATA BASE ***//
 func Init() *mongo.Client {
 
@@ -38,7 +39,7 @@ func Init() *mongo.Client {
 		defer cancel()
 
 		// client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://" + ViperConfigVariable("DB_HOST") + ":27017"))
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+ os.Getenv("DB_USER") +":"+ os.Getenv("DB_PASS") + "@"+ os.Getenv("DB_HOST") + ":27017/"))
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+os.Getenv("DB_USER")+":"+os.Getenv("DB_PASS")+"@"+os.Getenv("DB_HOST")+":27017/"))
 
 		//fmt.Println("mongodb://"+ViperConfigVariable("DB_HOST")+":27017")
 

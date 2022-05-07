@@ -27,9 +27,9 @@ func UpdateById(ctx *gin.Context) {
 	event.UpdateOneEvent(ctx)
 }
 
-func TerminateEventController(ctx *gin.Context){
+func TerminateEventController(ctx *gin.Context) {
 	event.Terminate(ctx)
 }
-func GetActiveEventController(ctx *gin.Context){
+func GetActiveEventController(ctx *gin.Context) {
 	event.GetActive(ctx)
 }

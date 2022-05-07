@@ -1,8 +1,9 @@
 package main
 
 import (
-    "kasra_medrick.com/mongo/App"
+	"kasra_medrick.com/mongo/App"
 )
-func main(){
-    app.StartApp()
+
+func main() {
+	app.StartApp()
 }

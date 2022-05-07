@@ -4,7 +4,7 @@ import (
 	"github.com/rs/xid"
 )
 
-func RandomId() string{
+func RandomId() string {
 	id := xid.New().String()
 	return id
 }

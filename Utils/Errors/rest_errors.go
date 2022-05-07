@@ -5,12 +5,12 @@ import "net/http"
 //TODO: CREATE REST ERRORS AND USE IT ANYWHERE!!
 
 type RestError struct {
-	Message string	`json:"message"`
-	Status 	int		`json:"code"`
-	Error 	string	`json:"error"`
+	Message string `json:"message"`
+	Status  int    `json:"code"`
+	Error   string `json:"error"`
 }
 
-func BadRequest (message string) *RestError {
+func BadRequest(message string) *RestError {
 	return &RestError{
 		Message: message,
 		Status:  http.StatusBadRequest,
@@ -18,7 +18,7 @@ func BadRequest (message string) *RestError {
 	}
 }
 
-func NotFoundError (message string) *RestError {
+func NotFoundError(message string) *RestError {
 	return &RestError{
 		Message: message,
 		Status:  http.StatusNotFound,
@@ -26,7 +26,7 @@ func NotFoundError (message string) *RestError {
 	}
 }
 
-func ServerError (message string) *RestError {
+func ServerError(message string) *RestError {
 	return &RestError{
 		Message: message,
 		Status:  http.StatusInternalServerError,
